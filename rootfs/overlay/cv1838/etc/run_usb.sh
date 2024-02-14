@@ -282,8 +282,7 @@ case "$1" in
 	probe
 	;;
   UDC)
-  UDC=`ls /sys/class/udc/ | awk '{print $1}'`
-  echo ${UDC} >$CVI_GADGET/UDC
+	ls /sys/class/udc/ >$CVI_GADGET/UDC
 	;;
   *)
 	echo "Usage: $0 probe {acm|msc|cvg|uvc|uac1} {file (msc)}"

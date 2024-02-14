@@ -1,0 +1,12 @@
+#!/bin/sh
+
+#
+# start utelnetd
+#
+
+if [ -f /usr/bin/utelnetd ];then
+	printf "Starting utelnetd:"
+	start-stop-daemon -S -q -b -x /usr/bin/utelnetd -- -p 23 -d
+	[ $? = 0 ] && echo "OK" || echo "FAIL"
+fi
+exit 0

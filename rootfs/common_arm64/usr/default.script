@@ -7,7 +7,7 @@ RESOLV_CONF="/etc/resolv.conf"
 
 NETMASK=""
 [ -n "$subnet" ] && NETMASK="netmask $subnet"
-BROADCAST="broadcast +"
+BROADCAST="broadcast "
 [ -n "$broadcast" ] && BROADCAST="broadcast $broadcast"
 
 case "$1" in
@@ -22,7 +22,7 @@ case "$1" in
 
 		if [ -n "$router" ] ; then
 			echo "Deleting routers"
-			while route del default gw 0.0.0.0 dev $interface ; do
+			while route del default gw 0.0.0.0 dev $interface 2> /dev/null; do
 				:
 			done
 

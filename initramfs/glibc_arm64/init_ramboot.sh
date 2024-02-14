@@ -41,7 +41,8 @@ chown root:root /bin/su
 chmod 4755 /bin/su
 
 #Create things under /dev
-mdev -s
+#mask "mdev -s" for PLD
+#mdev -s
 
 #Redirect output
 exec 0</dev/console

@@ -14,8 +14,7 @@ case "$1" in
   ;;
   stop)
     printf "Stopping logging: "
-    start-stop-daemon -K -p /var/run/klogd.pid
-    start-stop-daemon -K -p /var/run/syslogd.pid
+	killall klogd syslogd
     echo "OK"
     sleep 1
     umount /var/log
