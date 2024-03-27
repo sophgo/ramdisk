@@ -38,3 +38,4 @@ include $(TOP_DIR)/ramdisk/rootfs/public/i2c_tool/target.mk
 include $(TOP_DIR)/ramdisk/rootfs/public/pinmux/target.mk
 include $(TOP_DIR)/ramdisk/rootfs/public/envtools/target.mk
 include $(TOP_DIR)/ramdisk/rootfs/public/haasui/target.mk
+include $(TOP_DIR)/ramdisk/rootfs/public/rndis/target.mk
