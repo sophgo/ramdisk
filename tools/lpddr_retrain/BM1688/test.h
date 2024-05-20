@@ -3,6 +3,10 @@
 #include <stdint.h>
 #include <unistd.h>
 
+extern uint8_t uVO_en;
+extern uint8_t retrain_everytime;
+extern uint8_t temp_cnt;
+
 #define GENMASK(msb, lsb)	((2U << (msb))-(1U << (lsb)))
 
 // uint32_t mmio_rd32(uintptr_t addr);

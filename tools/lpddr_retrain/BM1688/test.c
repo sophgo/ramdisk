@@ -14,11 +14,11 @@
 #include <sys/stat.h>
 #include <errno.h>
 
-extern uint8_t uVO_en;
+// extern uint8_t uVO_en;
+// extern uint8_t retrain_everytime;
 
 uint32_t rddata;
 uint32_t ddrc_0x10;
-uint8_t temp_cnt;
 
 uint32_t tctdelay_init_sys0;
 uint32_t tctdelay_init_sys1;
@@ -1418,7 +1418,7 @@ uint32_t rdglvl_retrain_osc_comp(uint8_t uSys_id, uint32_t rank, uint32_t tctdel
 		//printf("mr19_out[1][0] = 0x%x, mr18_out[1][0] = 0x%x\n", mr19_out[1][0], mr18_out[1][0]);
 		// printf("tctdelay_pre = 0x%x, tctdelay_new = 0x%x\n", tctdelay_pre, tctdelay_new);
 
-		// 2 temp change --- 1 tctdelay code
+		// 2~3 temp change --- 1 tctdelay code
 		if ((tctdelay_new > tctdelay_pre) && ((tctdelay_new - tctdelay_pre) > 1)) {
 			//tctdelay_old - tctdelay_new) > margin  TBD
 			tctdelay_cur = tctdelay_new;
@@ -1438,7 +1438,7 @@ uint32_t rdglvl_retrain_osc_comp(uint8_t uSys_id, uint32_t rank, uint32_t tctdel
 			RETRAIN_LOG("temp no change\n");
 		}
 
-		if ((temp_inc == 1) || (temp_dec == 1)) {
+		if ((temp_inc == 1) || (temp_dec == 1) || (retrain_everytime == 1)) {
 			//wdq
 			tctdelay_init = (uSys_id == 0 ? tctdelay_init_sys0 : tctdelay_init_sys1);
 			//diff_code_rdg = (tctdelay_new - tctdelay_init) * 3;  //(tctdelay_new - tctdelay_old) * coef

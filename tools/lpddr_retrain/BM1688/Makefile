@@ -7,12 +7,12 @@ OBJS = $(SRCS:.c=.o)
 
 CFLAGS = --static
 
-all : ddrtest
+all : retrain
 
-ddrtest : $(OBJS)
-	$(CC) -o ddrtest $(SRCS) $(CFLAGS)
+retrain : $(OBJS)
+	$(CC) -o retrain $(SRCS) $(CFLAGS)
 	rm -f $(OBJS)
 
 .PHONY : clean
 clean:
-	rm -f $(OBJS) ddrtest
+	rm -f $(OBJS) retrain

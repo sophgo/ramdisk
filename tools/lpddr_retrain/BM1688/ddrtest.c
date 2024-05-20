@@ -20,19 +20,24 @@ uint32_t rddata;
 //uint32_t mask_code_init_sys1[2][4];
 
 uint8_t uVO_en;
+uint8_t retrain_everytime;
+uint8_t temp_cnt;
 uint8_t urtc_status = 0, uap_status = 0;
 
-int main(void)
+int main(int argc, char *argv[])
 {
 	time_t current_time;
 	char *c_time_string;
+	int second;
 
 	// uint8_t uSys_num = get_sys_num();//uSys_num;
 	uint8_t uSys_num = 2;//uSys_num;
 	// printf("sys num ==== %d\n", uSys_num);
-	test_log();
+	// test_log();
 
 	uVO_en = 0;
+	retrain_everytime = 0;
+	temp_cnt = 0;
 	tctdelay_pre_sys0 = 0;
 	tctdelay_pre_sys1 = 0;
 
@@ -69,6 +74,13 @@ int main(void)
 	rddata = devmem_readl(0x05026028);
 	rddata = modified_bits_by_value(rddata, 0, 3, 0);//rtc 0x05026028 bit3~0 to 0
 	devmem_writel(0x05026028, rddata);
+
+	if (argc == 1) {
+		second = 6;
+	} else {
+		second = atoi(argv[1]);
+		retrain_everytime = 1;
+	}
 
 	while (1) {
 		//
@@ -112,7 +124,7 @@ int main(void)
 			}
 		}
 
-		usleep(500000);
+		usleep(second*1000000);
 	}
 	return 0;
 }

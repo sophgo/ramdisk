@@ -34,20 +34,17 @@ mount -t proc proc /proc
 mount -t sysfs sysfs /sys
 
 #Create things under /dev
-busybox mdev -s
+/bin/busybox mdev -s
 
 if [ -e /dev/ubiblock0_0 ]; then
   echo "Mounting spinand rootfs"
   /bin/busybox mount -t squashfs -o ro /dev/ubiblock0_0 /mnt
-elif [ -e /dev/mmcblk0p2 ]; then
-  echo "Mounting SD ext4 partition"
-    /bin/busybox mount -t ext4 /dev/mmcblk0p2 /mnt
 else
   DEV=`/root/cmdline.sh`
   echo "Mounting emmc rootfs (${DEV})"
   until [ -e "${DEV}"  ]; do
     echo -ne "If the log shows more then 5 seconds, you may need to check your rootfs\r"
-    mdev -s
+    /bin/busybox mdev -s
     DEV=`/root/cmdline.sh`
   done
   /bin/busybox mount -t squashfs -o ro "${DEV}" /mnt
