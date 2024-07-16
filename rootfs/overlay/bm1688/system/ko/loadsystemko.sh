@@ -22,6 +22,7 @@ insmod /mnt/system/ko/soph_2d_engine.ko
 
 #insmod /mnt/system/ko/soph_wdt.ko
 insmod /mnt/system/ko/soph_clock_cooling.ko
+insmod /mnt/system/ko/sophon_spacc.ko
 
 insmod /mnt/system/ko/bmtpu.ko
 insmod /mnt/system/ko/soph_vc_drv.ko

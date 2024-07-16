@@ -20,22 +20,24 @@ uint32_t rddata;
 //uint32_t mask_code_init_sys1[2][4];
 
 uint8_t uVO_en;
+uint8_t uVI_en;
 uint8_t retrain_everytime;
 uint8_t temp_cnt;
-uint8_t urtc_status = 0, uap_status = 0;
+uint8_t urtc_status = 0, uap_status = 0, uvi_status = 0;
 
 int main(int argc, char *argv[])
 {
 	time_t current_time;
 	char *c_time_string;
-	int second;
+	int second = 0;
 
 	// uint8_t uSys_num = get_sys_num();//uSys_num;
 	uint8_t uSys_num = 2;//uSys_num;
 	// printf("sys num ==== %d\n", uSys_num);
-	// test_log();
+	test_log();
 
 	uVO_en = 0;
+	uVI_en = 0;
 	retrain_everytime = 0;
 	temp_cnt = 0;
 	tctdelay_pre_sys0 = 0;
@@ -90,8 +92,21 @@ int main(int argc, char *argv[])
 		} else {
 			uVO_en = 0;
 		}
+
+		if ((get_bits_from_value(devmem_readl(0x68000800), 24, 24) == 1) ||
+			(get_bits_from_value(devmem_readl(0x68004800), 24, 24) == 1) ||
+			(get_bits_from_value(devmem_readl(0x68008800), 24, 24) == 1) ||
+			(get_bits_from_value(devmem_readl(0x6800c800), 24, 24) == 1) ||
+			(get_bits_from_value(devmem_readl(0x68010800), 24, 24) == 1) ||
+			(get_bits_from_value(devmem_readl(0x68014800), 24, 24) == 1)) {
+			uVI_en = 1;
+		} else {
+			uVI_en = 0;
+		}
+
 		urtc_status = get_bits_from_value(devmem_readl(0x05026028), 3, 0);//Get rtc_status
 		uap_status  = get_bits_from_value(devmem_readl(0x281000f4), 3, 0);//Get AP status
+		uvi_status  = get_bits_from_value(devmem_readl(0x281000f4), 7, 4);//Get vi status
 
 		for (uint8_t i = 0; i < uSys_num; i++) {  // subsys
 			// printf("retrain0\n");
@@ -124,7 +139,14 @@ int main(int argc, char *argv[])
 			}
 		}
 
-		usleep(second*1000000);
+		//clear vi flag
+		if (uVI_en) {
+			rddata = devmem_readl(0x281000f4);
+			rddata = modified_bits_by_value(rddata, 0, 9, 8);
+			devmem_writel(0x281000f4, rddata);
+		}
+
+		usleep(second * 1000000);
 	}
 	return 0;
 }

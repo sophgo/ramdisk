@@ -16,7 +16,7 @@
 
 // extern uint8_t uVO_en;
 // extern uint8_t retrain_everytime;
-
+uint8_t count;
 uint32_t rddata;
 uint32_t ddrc_0x10;
 
@@ -1500,7 +1500,7 @@ uint32_t rdglvl_retrain_osc_comp(uint8_t uSys_id, uint32_t rank, uint32_t tctdel
 			// if (rank == 2) {
 				//rdqs retrain flow
 				//calculate value for retrain flow needed in 8051
-				if (temp_inc) {
+				if ((temp_inc) || (retrain_everytime == 1)) {
 					rdglvl_retrain_lp4_mpc(1, phyd_base_addr, ddr_ctrl, CV_DDR_PHYD_APB);
 				} else if (temp_dec) {
 					rdglvl_retrain_lp4_mpc(0, phyd_base_addr, ddr_ctrl, CV_DDR_PHYD_APB);
@@ -1510,6 +1510,22 @@ uint32_t rdglvl_retrain_osc_comp(uint8_t uSys_id, uint32_t rank, uint32_t tctdel
 				//reset rgd and realease reset
 				devmem_writel(phyd_base_addr + 0x128, 0x1d);
 				devmem_writel(phyd_base_addr + 0x128, 0x1f);
+				if (uVI_en == 1) {
+					//set vi info reg
+					rddata = devmem_readl(0x281000f4);
+					rddata = modified_bits_by_value(rddata, 1, 8, 8);
+					devmem_writel(0x281000f4, rddata);
+					count = 100;
+					while (count--) {
+						if (get_bits_from_value(devmem_readl(0x281000f4), 9, 9) == 1) {
+							rddata = devmem_readl(0x281000f4);
+							rddata = modified_bits_by_value(rddata, 0, 9, 9);
+							devmem_writel(0x281000f4, rddata);
+							break;
+						}
+						usleep(40 * 1000);
+					} //wait vi response and go continue
+				}
 				if (uVO_en == 1) { //with vo
 					//set AP info reg
 					rddata = devmem_readl(0x281000f4);
@@ -1569,6 +1585,22 @@ uint32_t rdglvl_retrain_osc_comp(uint8_t uSys_id, uint32_t rank, uint32_t tctdel
 				devmem_writel(phyd_base_addr + 0x128, 0x1f);
 				//printf("polling rank1 retrain\n");
 				//issue rank1 retrain request;
+				if (uVI_en == 1) {
+					//set vi info reg
+					rddata = devmem_readl(0x281000f4);
+					rddata = modified_bits_by_value(rddata, 1, 8, 8);
+					devmem_writel(0x281000f4, rddata);
+					count = 100;
+					while (count--) {
+						if (get_bits_from_value(devmem_readl(0x281000f4), 9, 9) == 1) {
+							rddata = devmem_readl(0x281000f4);
+							rddata = modified_bits_by_value(rddata, 0, 9, 9);
+							devmem_writel(0x281000f4, rddata);
+							break;
+						}
+						usleep(40 * 1000);
+					} //wait vi response and go continue
+				}
 				if (uVO_en == 1) { //with vo
 					//set AP info reg
 					rddata = devmem_readl(0x281000f4);
