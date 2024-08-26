@@ -1,0 +1,28 @@
+#!/bin/sh
+${CVI_SHOPTS}
+#
+# Start bmveth
+#
+
+case "$1" in
+  start)
+    printf "Starting bmveth: "
+    start-stop-daemon -b -q -S -x /usr/bin/bmveth &
+    [ $? = 0 ] && echo "OK" || echo "FAIL"
+    ;;
+  stop)
+    printf "Stopping bmveth: "
+    start-stop-daemon --stop --quiet --oknodo --pidfile /var/run/bmveth.pid
+    echo "OK"
+    ;;
+  restart|reload)
+    "$0" stop
+    "$0" start
+    ;;
+  *)
+    echo "Usage: $0 {start|stop|restart}"
+    exit 1
+esac
+
+exit $?
+

@@ -67,6 +67,7 @@ file /etc/run_usb.sh ../target/etc/run_usb.sh 775 1000 1000
 file /etc/uhubon.sh ../target/etc/uhubon.sh 775 1000 1000
 file /etc/init.d/rcK ../target/etc/init.d/rcK 775 1000 1000
 file /etc/init.d/rcS ../target/etc/init.d/rcS 755 0 0
+file /etc/init.d/S28veth ../target/etc/init.d/S28veth 755 0 0
 file /etc/mdev.conf ../target/etc/mdev.conf 644 0 0
 
 dir /lib 755 0 0
@@ -74,6 +75,7 @@ file /usr/bin/ethtool ../target/usr/bin/ethtool 775 0 0
 file /usr/bin/netperf ../target/usr/bin/netperf 775 0 0
 file /usr/bin/iperf3 ../target/usr/bin/iperf3 775 0 0
 file /usr/bin/memtester ../target/usr/bin/memtester 775 0 0
+file /usr/bin/bmveth ../target/usr/bin/bmveth 755 1000 1000
 file /lib/ld-linux-aarch64.so.1 ../target/lib/ld-linux-aarch64.so.1 775 0 0
 file /lib/libc.so.6 ../target/lib/libc.so.6 775 0 0
 file /lib/libc-2.32.so ../target/lib/libc-2.32.so 775 0 0
