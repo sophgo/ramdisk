@@ -61,7 +61,6 @@ done
 #Check and repair rootfs
 /bin/busybox touch /etc/mtab
 e2fsck -p /dev/mmcblk0p2
-e2fsck -p /dev/mmcblk0p3
 e2fsck -p /dev/mmcblk0p5
 e2fsck -p /dev/mmcblk0p6
 
