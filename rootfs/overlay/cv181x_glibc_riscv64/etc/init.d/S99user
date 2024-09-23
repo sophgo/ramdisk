@@ -9,7 +9,7 @@ export SYSTEMPATH=/mnt/system/
 case "$1" in
   start)
         echo "init mpp system..."
-        if [ -d $SYSTEMPATH/ko ]; then
+        if [ -f $SYSTEMPATH/ko/loadsystemko.sh ]; then
                 sh $SYSTEMPATH/ko/loadsystemko.sh
         fi
 

@@ -160,7 +160,8 @@ start() {
     find $CVI_GADGET/functions/ -name "*.usb$i" | xargs -I % ln -s % $CVI_GADGET/configs/c.1
   done
   # Start the gadget driver
-  echo 40e0000.cvi-usb-dev >$CVI_GADGET/UDC
+  UDC=`ls /sys/class/udc/ | awk '{print $1}'`
+  echo ${UDC} >$CVI_GADGET/UDC
 }
 
 stop() {

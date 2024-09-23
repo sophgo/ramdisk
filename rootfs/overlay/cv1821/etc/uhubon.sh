@@ -51,7 +51,12 @@ hub_off() {
 
 inst_mod() {
   insmod /mnt/system/ko/configfs.ko
+  insmod /mnt/system/ko/usb-common.ko
+  insmod /mnt/system/ko/udc-core.ko
   insmod /mnt/system/ko/libcomposite.ko
+  insmod /mnt/system/ko/usbcore.ko
+  insmod /mnt/system/ko/roles.ko
+  insmod /mnt/system/ko/dwc2.ko
   insmod /mnt/system/ko/u_serial.ko
   insmod /mnt/system/ko/usb_f_acm.ko
   insmod /mnt/system/ko/cvi_usb_f_cvg.ko

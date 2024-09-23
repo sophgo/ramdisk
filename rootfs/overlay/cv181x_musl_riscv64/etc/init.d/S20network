@@ -31,8 +31,6 @@ if [ -e "/sys/class/net/eth0" ]; then
   case "$1" in
     start)
       /sbin/ifconfig eth0 up
-      printf "Starting network: "
-      start-stop-daemon -b -q -S -x /sbin/udhcpc -- -b -i eth0 -R
       [ $? = 0 ] && echo "OK" || echo "FAIL"
       ;;
     stop)
