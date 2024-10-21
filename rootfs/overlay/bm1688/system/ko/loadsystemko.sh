@@ -9,7 +9,6 @@ insmod /mnt/system/ko/soph_mipi_rx.ko
 insmod /mnt/system/ko/soph_snsr_i2c.ko
 insmod /mnt/system/ko/soph_vi.ko
 insmod /mnt/system/ko/soph_vpss.ko
-insmod /mnt/system/ko/soph_dwa.ko
 insmod /mnt/system/ko/soph_ldc.ko
 insmod /mnt/system/ko/soph_rgn.ko
 insmod /mnt/system/ko/soph_vo.ko
