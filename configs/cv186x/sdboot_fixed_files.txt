@@ -27,3 +27,5 @@ slink /bin/chown /bin/busybox 755 0 0
 slink /bin/chmod /bin/busybox 755 0 0
 slink /bin/switch_root /bin/busybox 755 0 0
 
+file /bin/e2fsck.static ../target/bin/e2fsck.static 755 0 0
+slink /bin/e2fsck /bin/e2fsck.static 755 0 0
