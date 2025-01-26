@@ -75,7 +75,7 @@ fi
 /bin/busybox mkdir -p /media/root-rw
 /bin/busybox mount /dev/mmcblk0p5 /media/root-rw
 
-rm -rf  /media/root-rw/overlay-workdir/index/*
+/bin/busybox rm -rf  /media/root-rw/overlay-workdir
 
 /bin/busybox mkdir -p /media/root-rw/overlay
 /bin/busybox mkdir -p /media/root-rw/overlay-workdir
