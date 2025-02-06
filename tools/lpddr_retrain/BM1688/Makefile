@@ -1,4 +1,4 @@
-CC = aarch64-linux-gnu-gcc
+CC = aarch64-none-linux-gnu-gcc
 
 SRCS = ddrtest.c
 SRCS += test.c

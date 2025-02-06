@@ -294,7 +294,9 @@ uint32_t get_sys_num(void)
 
 	vol_val_ddr = get_adc3_vol();
 
-	if (get_bits_from_value(opt_reg, 5, 0) == 0x11) {
+	if ((get_bits_from_value(opt_reg, 8, 0) == 0x11)
+	|| (get_bits_from_value(opt_reg, 8, 0) == 0xF9)
+	|| (get_bits_from_value(opt_reg, 8, 0) == 0xC1)) {
 		// cv186ah
 		if (get_bits_from_value(gpio117_reg, 21, 21) == 0b0) {
 			// gpio 117 low

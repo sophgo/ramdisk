@@ -14,7 +14,6 @@ uint32_t rankid;
 uint32_t tctdelay_pre_sys0;
 uint32_t tctdelay_pre_sys1;
 
-uint32_t rddata;
 
 //uint32_t mask_code_init_sys0[2][4];
 //uint32_t mask_code_init_sys1[2][4];
@@ -27,12 +26,12 @@ uint8_t urtc_status = 0, uap_status = 0, uvi_status = 0;
 
 int main(int argc, char *argv[])
 {
+	uint32_t rddata;
 	time_t current_time;
 	char *c_time_string;
 	int second = 0;
 
-	// uint8_t uSys_num = get_sys_num();//uSys_num;
-	uint8_t uSys_num = 2;//uSys_num;
+	uint8_t uSys_num = get_sys_num();
 	// printf("sys num ==== %d\n", uSys_num);
 	test_log();
 
