@@ -45,30 +45,45 @@ int main(int argc, char *argv[])
 	// mrw
 	cvx32_synp_mrw_lp4(0x70004000, 23, 0x40, 1);
 	cvx32_synp_mrw_lp4(0x70004000, 23, 0x40, 2);
-	cvx32_synp_mrw_lp4(0x78004000, 23, 0x40, 1);
-	cvx32_synp_mrw_lp4(0x78004000, 23, 0x40, 2);
+	//cvx32_synp_mrw_lp4(0x78004000, 23, 0x40, 1);
+	//cvx32_synp_mrw_lp4(0x78004000, 23, 0x40, 2);
 
 	// disable rdg tracking
 	rddata = devmem_readl(0x70000070);
 	rddata = modified_bits_by_value(rddata, 0xf, 19, 16);
 	devmem_writel(0x70000070, rddata);
 
-	rddata = devmem_readl(0x78000070);
-	rddata = modified_bits_by_value(rddata, 0xf, 19, 16);
-	devmem_writel(0x78000070, rddata);
+	//rddata = devmem_readl(0x78000070);
+	//rddata = modified_bits_by_value(rddata, 0xf, 19, 16);
+	//devmem_writel(0x78000070, rddata);
 
 	// enable ctrlupd
 	devmem_writel(0x700041a0, 0x00400018);
-	devmem_writel(0x780041a0, 0x00400018);
+	//devmem_writel(0x780041a0, 0x00400018);
 
 	// clear phyd mrw ca_cmd
 	rddata = devmem_readl(0x700001ac);
 	rddata = modified_bits_by_value(rddata, 0x0, 25, 24);
 	devmem_writel(0x700001ac, rddata);
 
-	rddata = devmem_readl(0x780001ac);
-	rddata = modified_bits_by_value(rddata, 0x0, 25, 24);
-	devmem_writel(0x780001ac, rddata);
+	//rddata = devmem_readl(0x780001ac);
+	//rddata = modified_bits_by_value(rddata, 0x0, 25, 24);
+	//devmem_writel(0x780001ac, rddata);
+
+	if (uSys_num == 2) {
+		cvx32_synp_mrw_lp4(0x78004000, 23, 0x40, 1);
+		cvx32_synp_mrw_lp4(0x78004000, 23, 0x40, 2);
+
+		rddata = devmem_readl(0x78000070);
+		rddata = modified_bits_by_value(rddata, 0xf, 19, 16);
+		devmem_writel(0x78000070, rddata);
+
+		devmem_writel(0x780041a0, 0x00400018);
+
+		rddata = devmem_readl(0x780001ac);
+		rddata = modified_bits_by_value(rddata, 0x0, 25, 24);
+		devmem_writel(0x780001ac, rddata);
+	}
 
 	devmem_writel(0x281000f4, 0); //AP 0x281000f4 clear to 0;
 
