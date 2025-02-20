@@ -1,23 +1,80 @@
 #!/bin/sh
-echo "boottime skip..."
-#${CVI_SHOPTS}
-#clk=`devmem 0x28102000`
-#devmem 0x28102000 32 0xffffffff
-#BLD_TIME=$(awk "BEGIN{printf `devmem 0x0C03FFE0`/1000}")
-#BL2_TIME=$(awk "BEGIN{printf `devmem 0x0C03FFE4`/1000}")
-#BL31_TIME=$(awk "BEGIN{printf `devmem 0x0C03FFE8`/1000}")
-#BL32_TIME=$(awk "BEGIN{printf `devmem 0x0C03FFEC`/1000}")
-#BL33_TIME=$(awk "BEGIN{printf `devmem 0x0C03FFF0`/1000}")
-#BL1_TIME=$(awk "BEGIN{printf `devmem 0x0300009C`/1000}")
-#devmem 0x28102000 32 $clk
-#KERNEL_TIME=$(awk '{print $1}' /proc/uptime)
-#BOOTTIME=$(awk "BEGIN{printf $BLD_TIME+$BL2_TIME+$BL31_TIME+$BL32_TIME+$BL33_TIME+$KERNEL_TIME+$BL1_TIME}")
-uname -a > /tmp/boottime
-#echo "BL1 boottime: $BL1_TIME sec" >> /tmp/boottime
-#echo "BLD boottime: $BLD_TIME sec" >> /tmp/boottime
-#echo "BL2 boottime: $BL2_TIME sec"  >> /tmp/boottime
-#echo "BL31 boottime: $BL31_TIME sec" >> /tmp/boottime
-#echo "BL32 boottime: $BL32_TIME sec" >> /tmp/boottime
-#echo "BL33 boottime: $BL33_TIME sec" >> /tmp/boottime
-#echo "Kernel boottime: $KERNEL_TIME sec" >> /tmp/boottime
-#echo "Total boottime: $BOOTTIME sec" >> /tmp/boottime
+${CVI_SHOPTS}
+
+# from fsbl/plat/mars/include/platform_def.h
+# struct _time_records { ... }
+
+fields="
+bl2_start
+ddr_init_start
+ddr_init_end
+blmcu_start
+bl31_start
+bl32_start
+uboot_start
+uboot_cmd_start
+kernel_decompress_start
+kernel_start
+kernel_run_init_start
+NONE
+"
+
+fields=$(echo $fields)
+
+TIME_RECORDS_ADDR=0x25050010
+TIME_RECORDS_SIZE=$((2 * 12))
+
+OUTPUT=/tmp/boottime
+
+case "$1" in
+  start)
+	echo > "$OUTPUT"
+
+	for i in $(seq 0 4 $((TIME_RECORDS_SIZE - 4))); do
+        	addr=$((TIME_RECORDS_ADDR + i))
+        	ts=$(devmem $addr 32)
+       		# printf "0x%08x=0x%08x\n" "$a" "$ts"
+
+        	t0=$((ts & 0xffff))
+        	t1=$((ts >> 16))
+
+        	f0="${fields%% *}"
+        	fields="${fields#* }"
+        	f1="${fields%% *}"
+        	fields="${fields#* }"
+
+        	eval "${f0}=${t0}"
+        	eval "${f1}=${t1}"
+
+        	{
+                	echo "${f0}=${t0}ms"
+                	echo "${f1}=${t1}ms"
+        	} >> "$OUTPUT"
+	done
+
+	{
+		uname -a
+		echo "ROM elapsed time: ${bl2_start} milliseconds"
+		echo "DDR init elapsed time: $((ddr_init_end - ddr_init_start)) milliseconds"
+		echo "BLmcu run at: ${blmcu_start} milliseconds"
+		echo "BL31 run at: ${bl31_start} milliseconds"
+		echo "BL32 run at: ${bl32_start} milliseconds"
+		echo "U-boot run at: ${uboot_start} milliseconds"
+		echo "Kernel decompress start at: ${kernel_decompress_start} milliseconds"
+		echo "Kernel run at: ${kernel_start} milliseconds"
+		echo "Init process run at: ${kernel_run_init_start} milliseconds"
+		echo "Kernel uptime: $(awk '{print $1}' /proc/uptime) seconds"
+		echo "Total boottime: ?"
+	} >> "$OUTPUT"
+
+	;;
+  stop)
+        ;;
+  restart|reload)
+        ;;
+  *)
+        echo "Usage: $0 {start|stop|restart}"
+        exit 1
+esac
+
+exit $?

@@ -33,18 +33,35 @@ ${CVI_SHOPTS}
 mount -t proc proc /proc
 mount -t sysfs sysfs /sys
 
-echo "This script just mounts and boots the rootfs!"
+echo "init_sdboot!"
 
 #Create things under /dev
 busybox mdev -s
 
-until [ -e "$(findfs LABEL=rootfs)" ]; do
+until [ -e "$(findfs LABEL=ROOTFS)" ]; do
 	busybox mdev -s
 	echo "wait for rootfs device node created!"
 done
 
-#mount the rootfs
-mount -t ext4 -o rw $(findfs LABEL=rootfs) /mnt
+#Check and repair rootfs
+busybox touch /etc/mtab
+e2fsck -p /dev/mmcblk1p6
+e2fsck -p /dev/mmcblk1p7
+e2fsck -p /dev/mmcblk1p8
+
+busybox mkdir -p /media/root-ro
+busybox mount -o ro /dev/mmcblk1p6 /media/root-ro
+
+busybox mkdir -p /media/root-rw
+busybox mount /dev/mmcblk1p7 /media/root-rw
+
+busybox rm -rf  /media/root-rw/overlay-workdir/index/*
+
+busybox mkdir -p /media/root-rw/overlay
+busybox mkdir -p /media/root-rw/overlay-workdir
+mount -t overlay -o lowerdir=/media/root-ro,upperdir=/media/root-rw/overlay,workdir=/media/root-rw/overlay-workdir overlay /mnt
+
+busybox cp /mnt/etc/fstab.sd.ro /mnt/etc/fstab
 
 #clean up
 umount /proc
