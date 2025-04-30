@@ -78,6 +78,7 @@ file /usr/bin/memtester ../target/usr/bin/memtester 775 0 0
 file /usr/bin/bmveth ../target/usr/bin/bmveth 755 1000 1000
 file /lib/ld-linux-aarch64.so.1 ../target/lib/ld-linux-aarch64.so.1 775 0 0
 file /lib/libc.so.6 ../target/lib/libc.so.6 775 0 0
+file /lib/libdl.so.2 ../target/lib/libdl.so.2 775 0 0
 file /lib/libc-2.32.so ../target/lib/libc-2.32.so 775 0 0
 file /lib/libm-2.32.so ../target/lib/libm-2.32.so 775 0 0
 slink /lib/libm.so.6 lib/libm-2.32.so 775 0 0
