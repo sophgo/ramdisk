@@ -261,7 +261,7 @@ uint32_t get_adc3_vol(void)
 	char buffer[256];
 	uint32_t adc_val_ddr, vol_val_ddr;
 
-	// system("insmod /mnt/system/ko/soph_saradc.ko");
+	system("insmod /mnt/system/ko/soph_saradc.ko");
     /* Open the command for reading. */
 	fd = open("/sys/bus/iio/devices/iio:device0/in_voltage3_raw", O_RDWR | O_NOCTTY | O_NDELAY);
 	if (fd < 0) {
