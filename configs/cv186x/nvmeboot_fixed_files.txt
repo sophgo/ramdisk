@@ -2,7 +2,7 @@
 #####################
 # files to boot a minimal system
 
-file /init ../target/init_ramboot.sh 775 0 0
+file /init ../target/init_ubuntu_nvme.sh 775 0 0
 
 dir /dev 755 0 0
 dir /dev/shm 755 0 0
@@ -13,11 +13,6 @@ nod /dev/mem 660 0 0 c 1 1
 
 dir /bin 755 1000 1000
 file /bin/busybox ../target/bin/busybox 755 0 0
-file /bin/bash ../target/bin/bash 755 0 0
-file /bin/e2fsck.static ../target/bin/e2fsck.static 755 0 0
-slink /bin/e2fsck /bin/e2fsck.static 755 0 0
-file /bin/mke2fs ../target/bin/mke2fs 755 0 0
-slink /bin/mkfs.ext4 /bin/mke2fs 755 0 0
 slink /bin/su busybox 777 1000 1000
 slink /bin/sh /bin/busybox 755 0 0
 slink /linuxrc /bin/busybox 755 0 0
@@ -67,23 +62,16 @@ file /etc/run_usb.sh ../target/etc/run_usb.sh 775 1000 1000
 file /etc/uhubon.sh ../target/etc/uhubon.sh 775 1000 1000
 file /etc/init.d/rcK ../target/etc/init.d/rcK 775 1000 1000
 file /etc/init.d/rcS ../target/etc/init.d/rcS 755 0 0
-file /etc/init.d/S28veth ../target/etc/init.d/S28veth 755 0 0
 file /etc/mdev.conf ../target/etc/mdev.conf 644 0 0
+file /bin/e2fsck.static ../target/bin/e2fsck.static 755 0 0
+slink /bin/e2fsck /bin/e2fsck.static 755 0 0
 
 dir /lib 755 0 0
 file /usr/bin/ethtool ../target/usr/bin/ethtool 775 0 0
 file /usr/bin/netperf ../target/usr/bin/netperf 775 0 0
 file /usr/bin/iperf3 ../target/usr/bin/iperf3 775 0 0
-file /usr/bin/memtester ../target/usr/bin/memtester 775 0 0
-file /usr/bin/bmveth ../target/usr/bin/bmveth 755 1000 1000
 file /lib/ld-linux-aarch64.so.1 ../target/lib/ld-linux-aarch64.so.1 775 0 0
 file /lib/libc.so.6 ../target/lib/libc.so.6 775 0 0
-file /lib/libdl.so.2 ../target/lib/libdl.so.2 775 0 0
 file /lib/libc-2.32.so ../target/lib/libc-2.32.so 775 0 0
 file /lib/libm-2.32.so ../target/lib/libm-2.32.so 775 0 0
-slink /lib/libm.so.6 lib/libm-2.32.so 775 0 0
-file /lib/libtinfo.so.5 ../target/lib/libtinfo.so.5 755 0 0
-
-dir /lib/firmware 755 0 0
-file /lib/firmware/bm1688_firmware0.bin ../target/lib/firmware/bm1688_firmware0.bin 755 0 0
-file /lib/firmware/bm1688_firmware1.bin ../target/lib/firmware/bm1688_firmware1.bin 755 0 0
+slink /lib/libm.so.6 ../target/lib/libm-2.32.so 775 0 0
