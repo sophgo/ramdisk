@@ -1,5 +1,5 @@
 config TARGET_PACKAGE_NTP
 	bool "Target package ntp"
-	default n
+	default y
 	help
 	ntp version: 4.2.8p15
