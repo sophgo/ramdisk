@@ -1,15 +1,24 @@
-CC = riscv64-unknown-linux-musl-gcc
+ifeq ($(SDK_VER),musl)
+	CC = $(TOP_DIR)/host-tools/gcc/arm-gnu-toolchain-11.3.rel1-x86_64-arm-none-linux-musleabihf/bin/arm-linux-gcc
+else ifeq ($(SDK_VER),32bit)
+	CC = $(TOP_DIR)/host-tools/gcc/arm-gnu-toolchain-11.3.rel1-x86_64-arm-none-linux-gnueabihf/bin/arm-none-linux-gnueabihf-gcc
+else ifeq ($(SDK_VER),64bit)
+	CC = $(TOP_DIR)/host-tools/gcc/arm-gnu-toolchain-11.3.rel1-x86_64-aarch64-none-linux-gnu/bin/aarch64-none-linux-gnu-gcc
+else
+$(error Unknown SDK_VER)
+endif
 
 source  = cvi_pinmux.c devmem.c
-object  = $(source:%.cc=%.o)
+object  = $(source:%.c=%.o)
+TARGET = cvi_pinmux
 
-CFLAGS += -mcpu=c906fdv -march=rv64imafdcv0p7xthead -mcmodel=medany -mabi=lp64d -static
+all: $(TARGET)
 
-all: $(object)
-	$(CC) $(CFLAGS) $(object) -o cvi_pinmux
+$(TARGET): $(object)
+	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
 
 %.o: %.c
-	$(CC) $(CFLAGS) -c $<
+	$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
-	$(RM) *.o cvi_pinmux
+	$(RM) *.o $(TARGET)

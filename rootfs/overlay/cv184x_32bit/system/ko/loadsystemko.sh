@@ -16,7 +16,6 @@ modules_single_seq="
 /system/ko/cv184x_ldc.ko
 /system/ko/cv184x_vo.ko
 /system/ko/cv184x_mipi_tx.ko
-/system/ko/cv184x_gfbg.ko
 /system/ko/cv184x_tde.ko
 /system/ko/bmtpu.ko
 "

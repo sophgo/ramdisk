@@ -16,7 +16,9 @@ modules_single_seq="
 /system/ko/cv184x_ldc.ko
 /system/ko/cv184x_vo.ko
 /system/ko/cv184x_mipi_tx.ko
+/system/ko/cv184x_gfbg.ko
 /system/ko/cv184x_tde.ko
+/system/ko/bmtpu.ko
 "
 
 modules_dualos_seq="
@@ -24,6 +26,7 @@ modules_dualos_seq="
 /system/ko/cv184x_base.ko
 /system/ko/cv184x_tde.ko
 /system/ko/cvi_ipcm.ko
+/system/ko/bmtpu.ko
 "
 #/system/ko/cv184x_gfbg.ko
 #
