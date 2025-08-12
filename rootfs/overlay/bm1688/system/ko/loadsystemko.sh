@@ -24,7 +24,7 @@ insmod /mnt/system/ko/soph_clock_cooling.ko
 
 insmod /mnt/system/ko/bmtpu.ko
 insmod /mnt/system/ko/soph_vc_drv.ko
-#insmod /mnt/system/ko/soph_rtc.ko
+# insmod /mnt/system/ko/soph_rtc.ko
 
 echo 3 > /proc/sys/vm/drop_caches
 dmesg -n 4
