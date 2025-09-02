@@ -1,8 +1,8 @@
-ifeq ($(SDK_VER),musl)
+ifeq ($(SDK_VER),musl_arm)
 	CC = $(TOP_DIR)/host-tools/gcc/arm-gnu-toolchain-11.3.rel1-x86_64-arm-none-linux-musleabihf/bin/arm-linux-gcc
-else ifeq ($(SDK_VER),32bit)
+else ifeq ($(SDK_VER),glibc_arm)
 	CC = $(TOP_DIR)/host-tools/gcc/arm-gnu-toolchain-11.3.rel1-x86_64-arm-none-linux-gnueabihf/bin/arm-none-linux-gnueabihf-gcc
-else ifeq ($(SDK_VER),64bit)
+else ifeq ($(SDK_VER),glibc_arm64)
 	CC = $(TOP_DIR)/host-tools/gcc/arm-gnu-toolchain-11.3.rel1-x86_64-aarch64-none-linux-gnu/bin/aarch64-none-linux-gnu-gcc
 else
 $(error Unknown SDK_VER)
