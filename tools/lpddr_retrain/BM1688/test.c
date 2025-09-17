@@ -20,6 +20,8 @@ uint8_t count;
 uint32_t rddata;
 uint32_t ddrc_0x10;
 
+uint8_t show_log;
+
 uint32_t tctdelay_init_sys0;
 uint32_t tctdelay_init_sys1;
 int delay_code_init_dq_sys0[2][4][9];
@@ -1265,17 +1267,24 @@ void rdglvl_retrain_lp4_mpc(uint16_t temp_inc, uint32_t phyd_base_addr, uint32_t
 typedef int (*printf_func_type)(const char *, ...);
 printf_func_type retrain_log_func;
 
-#define RETRAIN_LOG(...) (retrain_log_func ? retrain_log_func(__VA_ARGS__) : (void)0)
+//#define RETRAIN_LOG(...) (retrain_log_func ? retrain_log_func(__VA_ARGS__) : (void)0)
+
+void RETRAIN_LOG(const char *format, ...)
+{
+	if (show_log == 1) {
+		printf(format);
+	}
+}
 
 void test_log(void)
 {
 	struct stat st = {0};
 	// check ddr dir
 	// printf("flag ============ %d\n", stat("/mnt/data/ddr", &st));
-	if (stat("/mnt/data/ddr", &st) == -1) {
-		retrain_log_func = NULL;
+	if (devmem_readl(0x7000141c) == 0) {
+		show_log = 0;
 	} else {
-		retrain_log_func = printf;
+		show_log = 1;
 	}
 }
 
@@ -1293,14 +1302,11 @@ uint32_t rdglvl_retrain_osc_comp(uint8_t uSys_id, uint32_t rank, uint32_t tctdel
 	uint8_t i, cnts;
 	uint32_t dll_code_sum;
 	uint32_t dll_code_avg;
-	uint32_t max_boundary;
+	int16_t max_boundary;
 	uint32_t tctdelay_init;
 	uint32_t base_addr;
 	int diff_code_wdq;
 	int delay_code;
-
-	// printf("retrain1\n");
-	// test_log();
 
 	devmem_writel(ddr_ctrl + 0x30, 0x00000100);//close some lp func
 
@@ -1313,7 +1319,7 @@ uint32_t rdglvl_retrain_osc_comp(uint8_t uSys_id, uint32_t rank, uint32_t tctdel
 	}
 	devmem_writel(ddr_ctrl + 0x30, 0x0000010b);//
 
-	// printf("retrain2\n");
+
 	//param_phyd_to_reg_rx_dll_code3-0
 	rddata = devmem_readl(0x3018 + phyd_base_addr);
 	//average dll code
@@ -1351,10 +1357,10 @@ uint32_t rdglvl_retrain_osc_comp(uint8_t uSys_id, uint32_t rank, uint32_t tctdel
 							get_bits_from_value(mr18_out[0][0], 7, 0));
 		tctdelay_init_sys0 = tctdelay_new;
 		tctdelay_cur = tctdelay_new;
-		for (i = 0; i < 2; i = i + 1) { //rank
+		//for (i = 0; i < 2; i = i + 1) { //rank
 			// printf("MR18[%d][0] ====================== 0x%x\n", i, mr18_out[i][0]);
 			// printf("MR19[%d][0] ====================== 0x%x\n", i, mr19_out[i][0]);
-		}
+		//}
 		rddata = devmem_readl(0x168 + phyd_base_addr);
 		if (get_bits_from_value(rddata, 4, 4) == 1)
 			base_addr = 0x600;
@@ -1365,11 +1371,11 @@ uint32_t rdglvl_retrain_osc_comp(uint8_t uSys_id, uint32_t rank, uint32_t tctdel
 				for (int k = 0; k < 4; k++) {
 					rddata = devmem_readl(base_addr + 0x600 * i + 0x60 * j + 0x4 * k +
 											phyd_base_addr);
-					delay_code_init_dq_sys0[i][j][2*k] = get_bits_from_value(rddata, 7, 0);
-					delay_code_init_dq_sys0[i][j][2*k+1] = get_bits_from_value(rddata, 23, 16);
+					delay_code_init_dq_sys0[i][j][2*k] = (int)get_bits_from_value(rddata, 7, 0);
+					delay_code_init_dq_sys0[i][j][2*k+1] = (int)get_bits_from_value(rddata, 23, 16);
 				}
 				rddata = devmem_readl(base_addr + 0x600 * i + 0x60 * j + 0x10 + phyd_base_addr);
-				delay_code_init_dq_sys0[i][j][8] = get_bits_from_value(rddata, 7, 0);
+				delay_code_init_dq_sys0[i][j][8] = (int)get_bits_from_value(rddata, 7, 0);
 			}
 		}
 		/*
@@ -1391,10 +1397,10 @@ uint32_t rdglvl_retrain_osc_comp(uint8_t uSys_id, uint32_t rank, uint32_t tctdel
 							get_bits_from_value(mr18_out[0][0], 7, 0));
 		tctdelay_init_sys1 = tctdelay_new;
 		tctdelay_cur = tctdelay_new;
-		for (i = 0; i < 2; i = i + 1) { //rank
+		//for (i = 0; i < 2; i = i + 1) { //rank
 			// printf("MR18[%d][0] ====================== 0x%x\n", i, mr18_out[i][0]);
 			// printf("MR19[%d][0] ====================== 0x%x\n", i, mr19_out[i][0]);
-		}
+		//}
 		rddata = devmem_readl(0x168 + phyd_base_addr);
 		if (get_bits_from_value(rddata, 4, 4) == 1)
 			base_addr = 0x600;
@@ -1405,11 +1411,11 @@ uint32_t rdglvl_retrain_osc_comp(uint8_t uSys_id, uint32_t rank, uint32_t tctdel
 				for (int k = 0; k < 4; k++) {
 					rddata = devmem_readl(base_addr + 0x600 * i + 0x60 * j + 0x4 * k +
 											phyd_base_addr);
-					delay_code_init_dq_sys1[i][j][2*k] = get_bits_from_value(rddata, 7, 0);
-					delay_code_init_dq_sys1[i][j][2*k+1] = get_bits_from_value(rddata, 23, 16);
+					delay_code_init_dq_sys1[i][j][2*k] = (int)get_bits_from_value(rddata, 7, 0);
+					delay_code_init_dq_sys1[i][j][2*k+1] = (int)get_bits_from_value(rddata, 23, 16);
 				}
 				rddata = devmem_readl(base_addr + 0x600 * i + 0x60 * j + 0x10 + phyd_base_addr);
-				delay_code_init_dq_sys1[i][j][8] = get_bits_from_value(rddata, 7, 0);
+				delay_code_init_dq_sys1[i][j][8] = (int)get_bits_from_value(rddata, 7, 0);
 			}
 		}
 		/*
@@ -1434,16 +1440,16 @@ uint32_t rdglvl_retrain_osc_comp(uint8_t uSys_id, uint32_t rank, uint32_t tctdel
 						get_bits_from_value(mr18_out[0][0], 7, 0));
 
 		//printf("mr19_out[1][0] = 0x%x, mr18_out[1][0] = 0x%x\n", mr19_out[1][0], mr18_out[1][0]);
-		// printf("tctdelay_pre = 0x%x, tctdelay_new = 0x%x\n", tctdelay_pre, tctdelay_new);
+		RETRAIN_LOG("tctdelay_pre = 0x%x, tctdelay_new = 0x%x\n", tctdelay_pre, tctdelay_new);
 
 		// 2~3 temp change --- 1 tctdelay code
-		if ((tctdelay_new > tctdelay_pre) && ((tctdelay_new - tctdelay_pre) > 1)) {
+		if ((tctdelay_new > tctdelay_pre) && ((tctdelay_new - tctdelay_pre) > 6)) {
 			//tctdelay_old - tctdelay_new) > margin  TBD
 			tctdelay_cur = tctdelay_new;
 			temp_inc = 1;
 			temp_dec = 0;
 			RETRAIN_LOG("temp_inc = 1\n");
-		} else if ((tctdelay_new < tctdelay_pre) && ((tctdelay_pre - tctdelay_new) > 1)) {
+		} else if ((tctdelay_new < tctdelay_pre) && ((tctdelay_pre - tctdelay_new) > 6)) {
 			//tctdelay_new - tctdelay_old) > margin  TBD
 			tctdelay_cur = tctdelay_new;
 			temp_inc = 0;

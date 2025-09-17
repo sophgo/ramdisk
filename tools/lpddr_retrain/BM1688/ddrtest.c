@@ -24,6 +24,8 @@ uint8_t retrain_everytime;
 uint8_t temp_cnt;
 uint8_t urtc_status = 0, uap_status = 0, uvi_status = 0;
 
+char sw_version[] = "VT Drift Compensation D-2025-09-16";
+
 int main(int argc, char *argv[])
 {
 	uint32_t rddata;
@@ -34,6 +36,8 @@ int main(int argc, char *argv[])
 	uint8_t uSys_num = get_sys_num();
 	// printf("sys num ==== %d\n", uSys_num);
 	test_log();
+
+	printf("%s\n", sw_version);
 
 	uVO_en = 0;
 	uVI_en = 0;
@@ -107,12 +111,8 @@ int main(int argc, char *argv[])
 			uVO_en = 0;
 		}
 
-		if ((get_bits_from_value(devmem_readl(0x68000800), 24, 24) == 1) ||
-			(get_bits_from_value(devmem_readl(0x68004800), 24, 24) == 1) ||
-			(get_bits_from_value(devmem_readl(0x68008800), 24, 24) == 1) ||
-			(get_bits_from_value(devmem_readl(0x6800c800), 24, 24) == 1) ||
-			(get_bits_from_value(devmem_readl(0x68010800), 24, 24) == 1) ||
-			(get_bits_from_value(devmem_readl(0x68014800), 24, 24) == 1)) {
+		//only enable linespliter need check vi status, others don't care
+		if ((get_bits_from_value(devmem_readl(0x6802892c), 0, 0) == 1)) {
 			uVI_en = 1;
 		} else {
 			uVI_en = 0;
