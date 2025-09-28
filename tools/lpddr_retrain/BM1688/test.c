@@ -1545,23 +1545,23 @@ uint32_t rdglvl_retrain_osc_comp(uint8_t uSys_id, uint32_t rank, uint32_t tctdel
 				//reset rgd and realease reset
 				devmem_writel(phyd_base_addr + 0x128, 0x1d);
 				devmem_writel(phyd_base_addr + 0x128, 0x1f);
-				if (uVI_en == 1) {
-					//set vi info reg
-					rddata = devmem_readl(0x281000f4);
-					rddata = modified_bits_by_value(rddata, 1, 8, 8);
-					devmem_writel(0x281000f4, rddata);
-					count = 100;
-					while (count--) {
-						if (get_bits_from_value(devmem_readl(0x281000f4), 9, 9) == 1) {
-							rddata = devmem_readl(0x281000f4);
-							rddata = modified_bits_by_value(rddata, 0, 9, 9);
-							devmem_writel(0x281000f4, rddata);
-							break;
-						}
-						usleep(40 * 1000);
-					} //wait vi response and go continue
-				}
-				if (uVO_en == 1) { //with vo
+				// if (uVI_en == 1) {
+				//	//set vi info reg
+				//	rddata = devmem_readl(0x281000f4);
+				//	rddata = modified_bits_by_value(rddata, 1, 8, 8);
+				//	devmem_writel(0x281000f4, rddata);
+				//	count = 100;
+				//	while (count--) {
+				//		if (get_bits_from_value(devmem_readl(0x281000f4), 9, 9) == 1) {
+				//			rddata = devmem_readl(0x281000f4);
+				//			rddata = modified_bits_by_value(rddata, 0, 9, 9);
+				//			devmem_writel(0x281000f4, rddata);
+				//			break;
+				//		}
+				//		usleep(40 * 1000);
+				//	} //wait vi response and go continue
+				// }
+				if (uVI_en == 1 || uVO_en == 1) { //with vo or vi
 					//set AP info reg
 					rddata = devmem_readl(0x281000f4);
 					rddata = modified_bits_by_value(rddata, 1 << (uSys_id * 2), 3, 0);
@@ -1586,7 +1586,7 @@ uint32_t rdglvl_retrain_osc_comp(uint8_t uSys_id, uint32_t rank, uint32_t tctdel
 				cnts = 0;
 			while (1) {
 				cnts++;
-				if (uVO_en == 0) {
+				if (uVO_en == 0 && uVI_en == 0) {
 					RETRAIN_LOG("vo_en:%d, 0x281000f4 = 0x%x, 0x05026028 = 0x%x\n",
 					uVO_en, devmem_readl(0x281000f4), devmem_readl(0x05026028));
 					if (get_bits_from_value(devmem_readl(0x05026028), 3, 0) == 0) {
@@ -1620,23 +1620,23 @@ uint32_t rdglvl_retrain_osc_comp(uint8_t uSys_id, uint32_t rank, uint32_t tctdel
 				devmem_writel(phyd_base_addr + 0x128, 0x1f);
 				//printf("polling rank1 retrain\n");
 				//issue rank1 retrain request;
-				if (uVI_en == 1) {
-					//set vi info reg
-					rddata = devmem_readl(0x281000f4);
-					rddata = modified_bits_by_value(rddata, 1, 8, 8);
-					devmem_writel(0x281000f4, rddata);
-					count = 100;
-					while (count--) {
-						if (get_bits_from_value(devmem_readl(0x281000f4), 9, 9) == 1) {
-							rddata = devmem_readl(0x281000f4);
-							rddata = modified_bits_by_value(rddata, 0, 9, 9);
-							devmem_writel(0x281000f4, rddata);
-							break;
-						}
-						usleep(40 * 1000);
-					} //wait vi response and go continue
-				}
-				if (uVO_en == 1) { //with vo
+				// if (uVI_en == 1) {
+				//	//set vi info reg
+				//	rddata = devmem_readl(0x281000f4);
+				//	rddata = modified_bits_by_value(rddata, 1, 8, 8);
+				//	devmem_writel(0x281000f4, rddata);
+				//	count = 100;
+				//	while (count--) {
+				//		if (get_bits_from_value(devmem_readl(0x281000f4), 9, 9) == 1) {
+				//			rddata = devmem_readl(0x281000f4);
+				//			rddata = modified_bits_by_value(rddata, 0, 9, 9);
+				//			devmem_writel(0x281000f4, rddata);
+				//			break;
+				//		}
+				//		usleep(40 * 1000);
+				//	} //wait vi response and go continue
+				//}
+				if (uVO_en == 1 || uVI_en == 1) { //with vo
 					//set AP info reg
 					rddata = devmem_readl(0x281000f4);
 					rddata = modified_bits_by_value(rddata, 2 << (uSys_id * 2), 3, 0);
@@ -1662,7 +1662,7 @@ uint32_t rdglvl_retrain_osc_comp(uint8_t uSys_id, uint32_t rank, uint32_t tctdel
 				cnts = 0;
 				while (1) {
 					cnts++;
-				if (uVO_en == 0) {
+				if (uVO_en == 0 && uVI_en == 0) {
 					RETRAIN_LOG("vo_en:%d, 0x281000f4 = 0x%x, 0x05026028 = 0x%x\n",
 					uVO_en, devmem_readl(0x281000f4), devmem_readl(0x05026028));
 					if (get_bits_from_value(devmem_readl(0x05026028), 3, 0) == 0) {

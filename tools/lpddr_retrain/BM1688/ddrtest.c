@@ -6,6 +6,9 @@
 #include <time.h>
 #include <stdlib.h>
 #include "test.h"
+#include <linux/kernel.h>
+#include <linux/module.h>
+#include <signal.h>
 
 uint32_t addr_ddr_ctrl;
 uint32_t phyd_base_addr, cv_ddr_phyd_apb;
@@ -24,7 +27,23 @@ uint8_t retrain_everytime;
 uint8_t temp_cnt;
 uint8_t urtc_status = 0, uap_status = 0, uvi_status = 0;
 
-char sw_version[] = "VT Drift Compensation D-2025-09-16";
+char sw_version[] = "VT Drift Compensation D-2025-09-22";
+
+void sig_term_handler(int signum, siginfo_t *info, void *ptr)
+{
+	printf("Terminate DRAM VT Drift Compesation.\n");
+}
+
+void catch_sigterm(void)
+{
+	static struct sigaction _sigact;
+
+	memset(&_sigact, 0, sizeof(_sigact));
+	_sigact.sa_sigaction = sig_term_handler;
+	_sigact.sa_flags = SA_SIGINFO;
+
+	sigaction(SIGTERM, &_sigact, NULL);
+}
 
 int main(int argc, char *argv[])
 {
@@ -32,6 +51,8 @@ int main(int argc, char *argv[])
 	time_t current_time;
 	char *c_time_string;
 	int second = 0;
+
+	catch_sigterm();
 
 	uint8_t uSys_num = get_sys_num();
 	// printf("sys num ==== %d\n", uSys_num);
@@ -112,7 +133,14 @@ int main(int argc, char *argv[])
 		}
 
 		//only enable linespliter need check vi status, others don't care
-		if ((get_bits_from_value(devmem_readl(0x6802892c), 0, 0) == 1)) {
+		if ((get_bits_from_value(devmem_readl(0x68000800), 24, 24) == 1) ||
+			(get_bits_from_value(devmem_readl(0x68004800), 24, 24) == 1) ||
+			(get_bits_from_value(devmem_readl(0x68008800), 24, 24) == 1) ||
+			(get_bits_from_value(devmem_readl(0x6800c800), 24, 24) == 1) ||
+			(get_bits_from_value(devmem_readl(0x68010800), 24, 24) == 1) ||
+			(get_bits_from_value(devmem_readl(0x68014800), 24, 24) == 1) ||
+			(get_bits_from_value(devmem_readl(0x68076000), 24, 24) == 1) ||
+			(get_bits_from_value(devmem_readl(0x68078000), 24, 24) == 1)) {
 			uVI_en = 1;
 		} else {
 			uVI_en = 0;
@@ -124,7 +152,7 @@ int main(int argc, char *argv[])
 
 		for (uint8_t i = 0; i < uSys_num; i++) {  // subsys
 			// printf("retrain0\n");
-			if (((uVO_en == 0) && (urtc_status == 0)) || ((uVO_en == 1) &&
+			if (((uVO_en == 0 && uVI_en == 0) && (urtc_status == 0)) || ((uVO_en == 1 || uVI_en == 1) &&
 								(uap_status == 0) && (urtc_status == 0))) {
 				if (i == 0) {
 					//sys0 base address init
@@ -154,11 +182,11 @@ int main(int argc, char *argv[])
 		}
 
 		//clear vi flag
-		if (uVI_en) {
-			rddata = devmem_readl(0x281000f4);
-			rddata = modified_bits_by_value(rddata, 0, 9, 8);
-			devmem_writel(0x281000f4, rddata);
-		}
+		//if (uVI_en) {
+		//	rddata = devmem_readl(0x281000f4);
+		//	rddata = modified_bits_by_value(rddata, 0, 9, 8);
+		//	devmem_writel(0x281000f4, rddata);
+		//}
 
 		usleep(second * 1000000);
 	}
