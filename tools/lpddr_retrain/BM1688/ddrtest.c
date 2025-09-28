@@ -21,17 +21,21 @@ uint32_t tctdelay_pre_sys1;
 //uint32_t mask_code_init_sys0[2][4];
 //uint32_t mask_code_init_sys1[2][4];
 
+uint8_t compesation_is_run;
+
 uint8_t uVO_en;
 uint8_t uVI_en;
 uint8_t retrain_everytime;
 uint8_t temp_cnt;
 uint8_t urtc_status = 0, uap_status = 0, uvi_status = 0;
 
-char sw_version[] = "VT Drift Compensation D-2025-09-22";
+char sw_version[] = "VT Drift Compensation D-2025-09-28";
 
 void sig_term_handler(int signum, siginfo_t *info, void *ptr)
 {
-	printf("Terminate DRAM VT Drift Compesation.\n");
+	printf("Signum %d: Terminate DRAM VT Drift Compesation.\n", signum);
+
+	compesation_is_run = 0;
 }
 
 void catch_sigterm(void)
@@ -43,6 +47,7 @@ void catch_sigterm(void)
 	_sigact.sa_flags = SA_SIGINFO;
 
 	sigaction(SIGTERM, &_sigact, NULL);
+	sigaction(SIGKILL, &_sigact, NULL);
 }
 
 int main(int argc, char *argv[])
@@ -59,6 +64,8 @@ int main(int argc, char *argv[])
 	test_log();
 
 	printf("%s\n", sw_version);
+
+	compesation_is_run = 1;
 
 	uVO_en = 0;
 	uVI_en = 0;
@@ -123,7 +130,7 @@ int main(int argc, char *argv[])
 		retrain_everytime = 1;
 	}
 
-	while (1) {
+	while (compesation_is_run) {
 		//
 		if ((get_bits_from_value(devmem_readl(0x67004000), 7, 7) == 1) ||
 							(get_bits_from_value(devmem_readl(0x67005000), 7, 7) == 1)) {
@@ -190,5 +197,6 @@ int main(int argc, char *argv[])
 
 		usleep(second * 1000000);
 	}
+	printf("VT Drift Track exit!\n");
 	return 0;
 }
