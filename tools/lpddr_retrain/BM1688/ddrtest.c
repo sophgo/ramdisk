@@ -33,7 +33,7 @@ char sw_version[] = "VT Drift Compensation D-2025-09-28";
 
 void sig_term_handler(int signum, siginfo_t *info, void *ptr)
 {
-	printf("Signum %d: Terminate DRAM VT Drift Compesation.\n", signum);
+	printf("Signum %d: Terminate retrain Compesation.\n", signum);
 
 	compesation_is_run = 0;
 }
@@ -56,6 +56,7 @@ int main(int argc, char *argv[])
 	time_t current_time;
 	char *c_time_string;
 	int second = 0;
+	int wait_cnt=0;
 
 	catch_sigterm();
 
@@ -194,8 +195,11 @@ int main(int argc, char *argv[])
 		//	rddata = modified_bits_by_value(rddata, 0, 9, 8);
 		//	devmem_writel(0x281000f4, rddata);
 		//}
-
-		usleep(second * 1000000);
+		wait_cnt = 0;
+		while(compesation_is_run && wait_cnt < second) {
+			usleep(1000000);
+			wait_cnt++;
+		}
 	}
 	printf("VT Drift Track exit!\n");
 	return 0;

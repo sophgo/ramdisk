@@ -26,7 +26,7 @@ uint32_t tctdelay_init_sys0;
 uint32_t tctdelay_init_sys1;
 int delay_code_init_dq_sys0[2][4][9];
 int delay_code_init_dq_sys1[2][4][9];
-
+extern uint8_t compesation_is_run;
 // DEBUG_SET_LEVEL(DEBUG_LEVEL_ERR);
 #define ERR printf
 #define DEBUG //printf
@@ -150,7 +150,7 @@ void cvx32_dfi_phymstr_req(unsigned long pyhd_base_addr)
 	rddata = 0x00000001;
 	devmem_writel(0x0178 + pyhd_base_addr, rddata);
 
-	while (1) {
+	while (compesation_is_run) {
 		rddata = devmem_readl(0x3030 + pyhd_base_addr);
 		if (get_bits_from_value(rddata, 1, 0) == 0x3) {
 			break;
@@ -163,7 +163,7 @@ void cvx32_dfi_phymstr_req_clr(unsigned long pyhd_base_addr)
 	rddata = 0x00000010;
 	devmem_writel(0x0178 + pyhd_base_addr, rddata);
 
-	while (1) {
+	while (compesation_is_run) {
 		rddata = devmem_readl(0x3030 + pyhd_base_addr);
 		if (get_bits_from_value(rddata, 1, 0) == 0x0) {
 			break;
@@ -190,7 +190,7 @@ void cvx32_dll_sw_clr(unsigned long ddr_ctrl, unsigned long pyhd_base_addr)
 	rddata = modified_bits_by_value(rddata, 1, 0, 0);
 	rddata = modified_bits_by_value(rddata, 1, 8, 8);
 	devmem_writel(0x0174 + pyhd_base_addr, rddata);
-	while (1) {
+	while (compesation_is_run) {
 		// param_phyd_to_reg_sw_phyupd_dline_done
 		rddata = devmem_readl(0x3030 + pyhd_base_addr);
 		if (get_bits_from_value(rddata, 24, 24) == 0x1) {
@@ -212,7 +212,7 @@ void cvx32_synp_mrw_lp4(uint32_t ddr_ctrl, uint32_t addr, uint32_t data, uint32_
 		// Poll MRSTAT.mr_wr_busy until it is 0
 		//`test_stream = "Poll MRSTAT.mr_wr_busy until it is 0";
 		rddata = 0;
-		while (1) {
+		while (compesation_is_run) {
 			rddata = devmem_readl(ddr_ctrl + 0x18);
 			if ((get_bits_from_value(rddata, 0, 0) == 0) && (get_bits_from_value(rddata, 16, 16) == 1)) {
 				break;
@@ -242,7 +242,7 @@ void cvx32_synp_mrw_lp4(uint32_t ddr_ctrl, uint32_t addr, uint32_t data, uint32_
 		rddata = modified_bits_by_value(rddata, 1, 31, 31);
 		devmem_writel(ddr_ctrl + 0x10, rddata);
 		//`test_stream = "lp4 Write MRCTRL0.mr_wr to 1";
-		while (1) {
+		while (compesation_is_run) {
 			rddata = devmem_readl(ddr_ctrl + 0x18);
 			//end while (rddata[0] != 0);
 			if (get_bits_from_value(rddata, 0, 0) == 0) {
@@ -519,7 +519,7 @@ void cvx32_synp_mrr_lp4_out(unsigned long addr, uint32_t rank, unsigned long ddr
 	devmem_writel(ddr_ctrl+0x18, 0x80000000);
 
 	rddata = 0;
-	while (1) {
+	while (compesation_is_run) {
 		rddata = devmem_readl(ddr_ctrl + 0x18);
 		if (get_bits_from_value(rddata, 0, 0) == 0 && get_bits_from_value(rddata, 16, 16) == 1) {
 			break;
@@ -540,7 +540,7 @@ void cvx32_synp_mrr_lp4_out(unsigned long addr, uint32_t rank, unsigned long ddr
 	rddata = modified_bits_by_value(rddata, 1, 31, 31);
 	devmem_writel(ddr_ctrl + 0x10, rddata);
 
-	while (1) {
+	while (compesation_is_run) {
 		rddata = devmem_readl(ddr_ctrl + 0x18);
 		if (get_bits_from_value(rddata, 0, 0) == 0) {
 			break;
@@ -565,7 +565,7 @@ void cvx32_synp_mpcosc_lp4(uint32_t rank, unsigned long ddr_ctrl)
 	devmem_writel(ddr_ctrl + 0x18, 0x80000000);
 	rddata = 0;
 
-	while (1) {
+	while (compesation_is_run) {
 		rddata = devmem_readl(ddr_ctrl + 0x18);
 		if (get_bits_from_value(rddata, 0, 0) == 0 && get_bits_from_value(rddata, 16, 16) == 1) {
 			break;
@@ -587,7 +587,7 @@ void cvx32_synp_mpcosc_lp4(uint32_t rank, unsigned long ddr_ctrl)
 	ddrc_0x10 = rddata;
 	devmem_writel(ddr_ctrl + 0x10, rddata);
 
-	while (1) {
+	while (compesation_is_run) {
 		rddata = devmem_readl(ddr_ctrl + 0x18);
 		if (get_bits_from_value(rddata, 0, 0) == 0) {
 			break;
@@ -1211,7 +1211,7 @@ void rdglvl_retrain_lp4_mpc(uint16_t temp_inc, uint32_t phyd_base_addr, uint32_t
 
 	 *write_robot(phy_184, rank0_rdglvl_req); //param_phyd_dfi_rdglvl_req
 
-	 *while (1) {
+	 *while (compesation_is_run) {
 	 ***[1] param_phyd_dfi_rdglvl_done
 	 *rddata = read_robot(phy_3444);
 	 ***printf("rd=%lx\n", rddata);
@@ -1235,7 +1235,7 @@ void rdglvl_retrain_lp4_mpc(uint16_t temp_inc, uint32_t phyd_base_addr, uint32_t
 	 ***rgdlvl_req
 	 *write_robot(phy_184, rank1_rdglvl_req);
 	 ***delay_us(30);
-	 *while (1) {
+	 *while (compesation_is_run) {
 	 ***[1] param_phyd_dfi_rdglvl_done
 	 *rddata = read_robot(phy_3444);
 	 *if (rddata & 0x2 == 0x2) {
@@ -1551,7 +1551,7 @@ uint32_t rdglvl_retrain_osc_comp(uint8_t uSys_id, uint32_t rank, uint32_t tctdel
 				//	rddata = modified_bits_by_value(rddata, 1, 8, 8);
 				//	devmem_writel(0x281000f4, rddata);
 				//	count = 100;
-				//	while (count--) {
+				//	while (compesation_is_run && count--) {
 				//		if (get_bits_from_value(devmem_readl(0x281000f4), 9, 9) == 1) {
 				//			rddata = devmem_readl(0x281000f4);
 				//			rddata = modified_bits_by_value(rddata, 0, 9, 9);
@@ -1584,7 +1584,7 @@ uint32_t rdglvl_retrain_osc_comp(uint8_t uSys_id, uint32_t rank, uint32_t tctdel
 
 				//polling rank0 retrain done
 				cnts = 0;
-			while (1) {
+			while (compesation_is_run) {
 				cnts++;
 				if (uVO_en == 0 && uVI_en == 0) {
 					RETRAIN_LOG("vo_en:%d, 0x281000f4 = 0x%x, 0x05026028 = 0x%x\n",
@@ -1626,7 +1626,7 @@ uint32_t rdglvl_retrain_osc_comp(uint8_t uSys_id, uint32_t rank, uint32_t tctdel
 				//	rddata = modified_bits_by_value(rddata, 1, 8, 8);
 				//	devmem_writel(0x281000f4, rddata);
 				//	count = 100;
-				//	while (count--) {
+				//	while (compesation_is_run && count--) {
 				//		if (get_bits_from_value(devmem_readl(0x281000f4), 9, 9) == 1) {
 				//			rddata = devmem_readl(0x281000f4);
 				//			rddata = modified_bits_by_value(rddata, 0, 9, 9);
@@ -1660,7 +1660,7 @@ uint32_t rdglvl_retrain_osc_comp(uint8_t uSys_id, uint32_t rank, uint32_t tctdel
 
 				//polling rank1 retrain done
 				cnts = 0;
-				while (1) {
+				while (compesation_is_run) {
 					cnts++;
 				if (uVO_en == 0 && uVI_en == 0) {
 					RETRAIN_LOG("vo_en:%d, 0x281000f4 = 0x%x, 0x05026028 = 0x%x\n",
