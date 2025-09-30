@@ -1,0 +1,5 @@
+config TARGET_PACKAGE_PYTHON3.10
+	bool "Target package python3.10"
+	default n
+	help
+	  target package python3.10
