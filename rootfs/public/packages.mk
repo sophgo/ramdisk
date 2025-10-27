@@ -20,6 +20,7 @@ include $(TOP_DIR)/ramdisk/rootfs/public/parted/target.mk
 include $(TOP_DIR)/ramdisk/rootfs/public/procrank/target.mk
 include $(TOP_DIR)/ramdisk/rootfs/public/procps/target.mk
 include $(TOP_DIR)/ramdisk/rootfs/public/python3.7/target.mk
+include $(TOP_DIR)/ramdisk/rootfs/public/python3.10/target.mk
 include $(TOP_DIR)/ramdisk/rootfs/public/rsyslog/target.mk
 include $(TOP_DIR)/ramdisk/rootfs/public/secure_image/target.mk
 include $(TOP_DIR)/ramdisk/rootfs/public/wifi/target.mk

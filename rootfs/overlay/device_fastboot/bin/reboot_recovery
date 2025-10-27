@@ -1,0 +1,2 @@
+echo "rebooting to recovery mode"
+reboot

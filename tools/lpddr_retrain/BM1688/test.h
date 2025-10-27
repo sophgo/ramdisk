@@ -3,6 +3,8 @@
 #include <stdint.h>
 #include <unistd.h>
 
+extern uint8_t show_log;
+
 extern uint8_t uVO_en;
 extern uint8_t uVI_en;
 extern uint8_t retrain_everytime;

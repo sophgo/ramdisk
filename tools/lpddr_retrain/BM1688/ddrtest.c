@@ -6,6 +6,9 @@
 #include <time.h>
 #include <stdlib.h>
 #include "test.h"
+#include <linux/kernel.h>
+#include <linux/module.h>
+#include <signal.h>
 
 uint32_t addr_ddr_ctrl;
 uint32_t phyd_base_addr, cv_ddr_phyd_apb;
@@ -18,11 +21,34 @@ uint32_t tctdelay_pre_sys1;
 //uint32_t mask_code_init_sys0[2][4];
 //uint32_t mask_code_init_sys1[2][4];
 
+uint8_t compesation_is_run;
+
 uint8_t uVO_en;
 uint8_t uVI_en;
 uint8_t retrain_everytime;
 uint8_t temp_cnt;
 uint8_t urtc_status = 0, uap_status = 0, uvi_status = 0;
+
+char sw_version[] = "VT Drift Compensation D-2025-09-28";
+
+void sig_term_handler(int signum, siginfo_t *info, void *ptr)
+{
+	printf("Signum %d: Terminate retrain Compesation.\n", signum);
+
+	compesation_is_run = 0;
+}
+
+void catch_sigterm(void)
+{
+	static struct sigaction _sigact;
+
+	memset(&_sigact, 0, sizeof(_sigact));
+	_sigact.sa_sigaction = sig_term_handler;
+	_sigact.sa_flags = SA_SIGINFO;
+
+	sigaction(SIGTERM, &_sigact, NULL);
+	sigaction(SIGKILL, &_sigact, NULL);
+}
 
 int main(int argc, char *argv[])
 {
@@ -30,10 +56,17 @@ int main(int argc, char *argv[])
 	time_t current_time;
 	char *c_time_string;
 	int second = 0;
+	int wait_cnt=0;
+
+	catch_sigterm();
 
 	uint8_t uSys_num = get_sys_num();
 	// printf("sys num ==== %d\n", uSys_num);
 	test_log();
+
+	printf("%s\n", sw_version);
+
+	compesation_is_run = 1;
 
 	uVO_en = 0;
 	uVI_en = 0;
@@ -98,7 +131,7 @@ int main(int argc, char *argv[])
 		retrain_everytime = 1;
 	}
 
-	while (1) {
+	while (compesation_is_run) {
 		//
 		if ((get_bits_from_value(devmem_readl(0x67004000), 7, 7) == 1) ||
 							(get_bits_from_value(devmem_readl(0x67005000), 7, 7) == 1)) {
@@ -107,12 +140,15 @@ int main(int argc, char *argv[])
 			uVO_en = 0;
 		}
 
+		//only enable linespliter need check vi status, others don't care
 		if ((get_bits_from_value(devmem_readl(0x68000800), 24, 24) == 1) ||
 			(get_bits_from_value(devmem_readl(0x68004800), 24, 24) == 1) ||
 			(get_bits_from_value(devmem_readl(0x68008800), 24, 24) == 1) ||
 			(get_bits_from_value(devmem_readl(0x6800c800), 24, 24) == 1) ||
 			(get_bits_from_value(devmem_readl(0x68010800), 24, 24) == 1) ||
-			(get_bits_from_value(devmem_readl(0x68014800), 24, 24) == 1)) {
+			(get_bits_from_value(devmem_readl(0x68014800), 24, 24) == 1) ||
+			(get_bits_from_value(devmem_readl(0x68076000), 24, 24) == 1) ||
+			(get_bits_from_value(devmem_readl(0x68078000), 24, 24) == 1)) {
 			uVI_en = 1;
 		} else {
 			uVI_en = 0;
@@ -124,7 +160,7 @@ int main(int argc, char *argv[])
 
 		for (uint8_t i = 0; i < uSys_num; i++) {  // subsys
 			// printf("retrain0\n");
-			if (((uVO_en == 0) && (urtc_status == 0)) || ((uVO_en == 1) &&
+			if (((uVO_en == 0 && uVI_en == 0) && (urtc_status == 0)) || ((uVO_en == 1 || uVI_en == 1) &&
 								(uap_status == 0) && (urtc_status == 0))) {
 				if (i == 0) {
 					//sys0 base address init
@@ -154,13 +190,17 @@ int main(int argc, char *argv[])
 		}
 
 		//clear vi flag
-		if (uVI_en) {
-			rddata = devmem_readl(0x281000f4);
-			rddata = modified_bits_by_value(rddata, 0, 9, 8);
-			devmem_writel(0x281000f4, rddata);
+		//if (uVI_en) {
+		//	rddata = devmem_readl(0x281000f4);
+		//	rddata = modified_bits_by_value(rddata, 0, 9, 8);
+		//	devmem_writel(0x281000f4, rddata);
+		//}
+		wait_cnt = 0;
+		while(compesation_is_run && wait_cnt < second) {
+			usleep(1000000);
+			wait_cnt++;
 		}
-
-		usleep(second * 1000000);
 	}
+	printf("VT Drift Track exit!\n");
 	return 0;
 }
