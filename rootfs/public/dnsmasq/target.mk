@@ -1,0 +1,3 @@
+ifeq ($(CONFIG_TARGET_PACKAGE_DNSMASQ),y)
+TARGET_PACKAGES += dnsmasq
+endif

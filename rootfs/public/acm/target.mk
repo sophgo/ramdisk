@@ -1,0 +1,3 @@
+ifeq ($(CONFIG_TARGET_PACKAGE_ACM_SCRIPT),y)
+TARGET_PACKAGES += acm
+endif

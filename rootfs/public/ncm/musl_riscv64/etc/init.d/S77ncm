@@ -1,0 +1,28 @@
+#!/bin/sh
+${CVI_SHOPTS}
+
+case "$1" in
+  start)
+    echo device > /proc/cviusb/otg_role
+    printf "Starting ncm: "
+    /etc/run_usb.sh probe ncm
+    /etc/run_usb.sh start ncm
+    sleep 0.5
+    ifconfig usb0 up
+    ifconfig usb0 192.168.42.1
+    [ $? = 0 ] && echo "OK" || echo "FAIL"
+  ;;
+  stop)
+    printf "Stopping ncm: "
+    /etc/run_usb.sh stop
+    echo "OK"
+    sleep 1
+  ;;
+  restart)
+    printf "Restarting ncm: "
+    /etc/run_usb.sh stop
+    sleep 1
+    /etc/run_usb.sh start
+    echo "OK"
+  ;;
+esac

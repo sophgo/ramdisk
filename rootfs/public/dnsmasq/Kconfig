@@ -1,0 +1,5 @@
+config TARGET_PACKAGE_DNSMASQ
+	bool "Target package dnsmasq"
+	default n
+	help
+		target package dnsmasq

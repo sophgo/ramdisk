@@ -1,0 +1,5 @@
+config TARGET_PACKAGE_NCM_SCRIPT
+        bool "Target package ncm script"
+        default n
+        help
+          target package ncm script

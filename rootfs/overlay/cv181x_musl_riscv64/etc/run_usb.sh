@@ -5,12 +5,14 @@ MSC_PID=0x1008
 RNDIS_PID=0x1009
 UVC_PID=0x100A
 UAC_PID=0x100B
+NCM_PID=0x100C
 ADB_VID=0x18D1
 ADB_PID=0x4EE0
 ADB_PID_M1=0x4EE2
 ADB_PID_M2=0x4EE4
 MANUFACTURER="Cvitek"
 PRODUCT="USB Com Port"
+PRODUCT_NCM="NCM"
 PRODUCT_RNDIS="RNDIS"
 PRODUCT_UVC="UVC"
 PRODUCT_UAC="UAC"
@@ -39,6 +41,11 @@ case "$2" in
   cvg)
 	CLASS=cvg
 	;;
+  ncm)
+	CLASS=ncm
+	PID=$NCM_PID
+	PRODUCT=$PRODUCT_NCM
+	;;
   rndis)
 	CLASS=rndis
 	PID=$RNDIS_PID
@@ -62,7 +69,7 @@ case "$2" in
 	;;
   *)
 	if [ "$1" = "probe" ] ; then
-	  echo "Usage: $0 probe {acm|msc|cvg|rndis|uvc|uac1|adb}"
+	  echo "Usage: $0 probe {acm|msc|cvg|ncm|rndis|uvc|uac1|adb}"
 	  exit 1
 	fi
 esac
@@ -83,6 +90,11 @@ res_check() {
   EP_OUT=$(($EP_OUT+$TMP_NUM))
   INTF_NUM=$(($INTF_NUM+$TMP_NUM))
   TMP_NUM=$(find $CVI_GADGET/functions/ -name "cvg*" | wc -l)
+  EP_IN=$(($EP_IN+$TMP_NUM))
+  EP_OUT=$(($EP_OUT+$TMP_NUM))
+  INTF_NUM=$(($INTF_NUM+$TMP_NUM))
+  TMP_NUM=$(find $CVI_GADGET/functions/ -name "ncm*" | wc -l)
+  TMP_NUM=$(($TMP_NUM * 2))
   EP_IN=$(($EP_IN+$TMP_NUM))
   EP_OUT=$(($EP_OUT+$TMP_NUM))
   INTF_NUM=$(($INTF_NUM+$TMP_NUM))
@@ -114,6 +126,10 @@ res_check() {
     EP_OUT=$(($EP_OUT+1))
   fi
   if [ "$CLASS" = "cvg" ] ; then
+    EP_IN=$(($EP_IN+1))
+    EP_OUT=$(($EP_OUT+1))
+  fi
+  if [ "$CLASS" = "ncm" ] ; then
     EP_IN=$(($EP_IN+1))
     EP_OUT=$(($EP_OUT+1))
   fi
@@ -197,6 +213,9 @@ probe() {
   if [ "$CLASS" = "mass_storage" ] ; then
     echo $MSC_FILE >$CVI_GADGET/functions/$CLASS.usb$FUNC_NUM/lun.0/file
   fi
+  if [ "$CLASS" = "ncm" ] ; then
+    ln -s $CVI_FUNC/ncm.usb$FUNC_NUM $CVI_GADGET/configs/c.1
+  fi
   if [ "$CLASS" = "rndis" ] ; then
     #OS STRING
     echo 1 >$CVI_GADGET/os_desc/use
@@ -219,11 +238,27 @@ probe() {
 }
 
 start() {
+  if [ ! -d $CVI_GADGET ]; then
+    echo "USB gadget is not initialized, please probe functions first"
+    exit 1
+  fi
   # link this function to the configuration
   calc_func
   if [ $FUNC_NUM -eq 0 ]; then
     echo "Functions Empty!"
     exit 1
+  fi
+  CURRENT_UDC=""
+  if [ -f $CVI_GADGET/UDC ]; then
+    CURRENT_UDC=$(cat $CVI_GADGET/UDC)
+    if [ -n "$CURRENT_UDC" ]; then
+      echo "" >$CVI_GADGET/UDC
+    fi
+  fi
+  # clean previous links to avoid duplicate entries when restart
+  find $CVI_GADGET/configs/ -name "*.usb*" -exec rm -f {} \;
+  if [ -L $CVI_GADGET/configs/c.1/ffs.adb ]; then
+    rm -f $CVI_GADGET/configs/c.1/ffs.adb
   fi
   if [ -d $CVI_GADGET/functions/ffs.adb ]; then
     FUNC_NUM=$(($FUNC_NUM-1))
@@ -235,14 +270,18 @@ start() {
   if [ -d $CVI_GADGET/functions/ffs.adb ]; then
     ln -s $CVI_GADGET/functions/ffs.adb $CVI_GADGET/configs/c.1
     mkdir /dev/usb-ffs/adb -p
-    mount -t functionfs adb /dev/usb-ffs/adb
+    if ! mountpoint -q /dev/usb-ffs/adb; then
+      mount -t functionfs adb /dev/usb-ffs/adb
+    fi
     if [ -f $ADBD_PATH/adbd ]; then
 	$ADBD_PATH/adbd &
     fi
   else
     # Start the gadget driver
-    UDC=`ls /sys/class/udc/ | awk '{print $1}'`
-    echo ${UDC} >$CVI_GADGET/UDC
+    if [ -z "$CURRENT_UDC" ]; then
+      CURRENT_UDC=`ls /sys/class/udc/ | awk 'NR==1{print $1}'`
+    fi
+    echo ${CURRENT_UDC} >$CVI_GADGET/UDC
   fi
 }
 
@@ -281,11 +320,10 @@ case "$1" in
 	probe
 	;;
   UDC)
-  UDC=`ls /sys/class/udc/ | awk '{print $1}'`
-  echo ${UDC} >$CVI_GADGET/UDC
+	ls /sys/class/udc/ >$CVI_GADGET/UDC
 	;;
   *)
-	echo "Usage: $0 probe {acm|msc|cvg|uvc|uac1} {file (msc)}"
+	echo "Usage: $0 probe {acm|msc|cvg|ncm|uvc|uac1} {file (msc)}"
 	echo "Usage: $0 start"
 	echo "Usage: $0 stop"
 	exit 1

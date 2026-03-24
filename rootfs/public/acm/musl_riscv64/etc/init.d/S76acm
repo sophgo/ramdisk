@@ -1,0 +1,25 @@
+#!/bin/sh
+${CVI_SHOPTS}
+
+case "$1" in
+  start)
+    echo device > /proc/cviusb/otg_role
+    printf "Preparing acm: "
+    /etc/run_usb.sh probe acm
+    /etc/run_usb.sh start acm
+    [ $? = 0 ] && echo "OK" || echo "FAIL"
+  ;;
+  stop)
+    :
+  ;;
+  restart)
+    "$0" stop
+    "$0" start
+  ;;
+  *)
+    echo "Usage: $0 {start|stop|restart}"
+    exit 1
+  ;;
+esac
+
+exit 0
