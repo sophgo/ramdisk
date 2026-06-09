@@ -21,7 +21,7 @@ uint32_t tctdelay_pre_sys1;
 //uint32_t mask_code_init_sys0[2][4];
 //uint32_t mask_code_init_sys1[2][4];
 
-uint8_t compesation_is_run;
+volatile uint8_t compesation_is_run;
 
 uint8_t uVO_en;
 uint8_t uVI_en;
@@ -47,7 +47,8 @@ void catch_sigterm(void)
 	_sigact.sa_flags = SA_SIGINFO;
 
 	sigaction(SIGTERM, &_sigact, NULL);
-	sigaction(SIGKILL, &_sigact, NULL);
+	sigaction(SIGINT, &_sigact, NULL);
+	sigaction(SIGHUP, &_sigact, NULL);
 }
 
 int main(int argc, char *argv[])
@@ -201,6 +202,7 @@ int main(int argc, char *argv[])
 			wait_cnt++;
 		}
 	}
+	retrain_shutdown_cleanup(uSys_num);
 	printf("VT Drift Track exit!\n");
 	return 0;
 }

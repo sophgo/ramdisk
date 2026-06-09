@@ -26,7 +26,7 @@ uint32_t tctdelay_init_sys0;
 uint32_t tctdelay_init_sys1;
 int delay_code_init_dq_sys0[2][4][9];
 int delay_code_init_dq_sys1[2][4][9];
-extern uint8_t compesation_is_run;
+extern volatile uint8_t compesation_is_run;
 // DEBUG_SET_LEVEL(DEBUG_LEVEL_ERR);
 #define ERR printf
 #define DEBUG //printf
@@ -168,6 +168,54 @@ void cvx32_dfi_phymstr_req_clr(unsigned long pyhd_base_addr)
 		if (get_bits_from_value(rddata, 1, 0) == 0x0) {
 			break;
 		}
+	}
+}
+
+static void dfi_phymstr_req_clr_timeout(unsigned long pyhd_base_addr, int max_retry)
+{
+	int i;
+
+	devmem_writel(0x0178 + pyhd_base_addr, 0x00000010);
+	for (i = 0; i < max_retry; i++) {
+		rddata = devmem_readl(0x3030 + pyhd_base_addr);
+		if (get_bits_from_value(rddata, 1, 0) == 0x0)
+			break;
+		usleep(1000);
+	}
+}
+
+void retrain_shutdown_cleanup(uint8_t uSys_num)
+{
+	uint32_t rddata;
+	int i;
+	static const uint32_t phyd_bases[2] = { 0x70000000, 0x78000000 };
+	static const uint32_t ddr_ctrls[2] = { 0x70004000, 0x78004000 };
+
+	rddata = devmem_readl(0x05026028);
+	rddata = modified_bits_by_value(rddata, 0, 3, 0);
+	devmem_writel(0x05026028, rddata);
+
+	rddata = devmem_readl(0x281000f4);
+	rddata = modified_bits_by_value(rddata, 0, 3, 0);
+	rddata = modified_bits_by_value(rddata, 0, 7, 4);
+	devmem_writel(0x281000f4, rddata);
+
+	rddata = devmem_readl(0x281000f8);
+	rddata = modified_bits_by_value(rddata, 0, 16, 16);
+	devmem_writel(0x281000f8, rddata);
+
+	for (i = 0; i < 500; i++) {
+		if (get_bits_from_value(devmem_readl(0x05026028), 3, 0) == 0 &&
+		    get_bits_from_value(devmem_readl(0x281000f4), 3, 0) == 0)
+			break;
+		usleep(10000);
+	}
+
+	for (i = 0; i < uSys_num && i < 2; i++) {
+		devmem_writel(phyd_bases[i] + 0x128, 0x1d);
+		devmem_writel(phyd_bases[i] + 0x128, 0x1f);
+		dfi_phymstr_req_clr_timeout(phyd_bases[i], 1000);
+		devmem_writel(ddr_ctrls[i] + 0x30, 0x0000010b);
 	}
 }
 

@@ -40,3 +40,4 @@ void rdglvl_retrain_lp4_mpc(uint16_t temp_inc, uint32_t phyd_base_addr, uint32_t
 					uint32_t CV_DDR_PHYD_APB);
 uint32_t rdglvl_retrain_osc_comp(uint8_t uSys_id, uint32_t rank, uint32_t tctdelay_pre,
 					uint32_t phyd_base_addr, uint32_t ddr_ctrl, uint32_t CV_DDR_PHYD_APB);
+void retrain_shutdown_cleanup(uint8_t uSys_num);
