@@ -1,4 +1,6 @@
 source "../ramdisk/rootfs/public/adbd/Kconfig"
+source "../ramdisk/rootfs/public/aic8800dc/Kconfig"
+source "../ramdisk/rootfs/public/aic8800d80/Kconfig"
 source "../ramdisk/rootfs/public/ap6201bm/Kconfig"
 source "../ramdisk/rootfs/public/bluetooth/Kconfig"
 source "../ramdisk/rootfs/public/cvitracer/Kconfig"

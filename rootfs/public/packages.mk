@@ -1,4 +1,6 @@
 include $(TOP_DIR)/ramdisk/rootfs/public/adbd/target.mk
+include $(TOP_DIR)/ramdisk/rootfs/public/aic8800dc/target.mk
+include $(TOP_DIR)/ramdisk/rootfs/public/aic8800d80/target.mk
 include $(TOP_DIR)/ramdisk/rootfs/public/ap6201bm/target.mk
 include $(TOP_DIR)/ramdisk/rootfs/public/bluetooth/target.mk
 include $(TOP_DIR)/ramdisk/rootfs/public/cvitracer/target.mk

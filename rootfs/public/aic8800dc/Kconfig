@@ -1,0 +1,7 @@
+config TARGET_PACKAGE_AIC8800DC
+	bool "Target package of AIC8800DC firmware files"
+	default n
+	help
+	  target package of AIC8800DC firmware and configuration files
+	  Do not enable this option together with TARGET_PACKAGE_AIC8800D80,
+	  because both packages install files to /mnt/system/firmware/aic8800.
