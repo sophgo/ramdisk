@@ -15,6 +15,7 @@ include $(TOP_DIR)/ramdisk/rootfs/public/libz/target.mk
 include $(TOP_DIR)/ramdisk/rootfs/public/mtd-utils/target.mk
 include $(TOP_DIR)/ramdisk/rootfs/public/nanomsg/target.mk
 include $(TOP_DIR)/ramdisk/rootfs/public/openssl/target.mk
+include $(TOP_DIR)/ramdisk/rootfs/public/openssh/target.mk
 include $(TOP_DIR)/ramdisk/rootfs/public/otaserver/target.mk
 include $(TOP_DIR)/ramdisk/rootfs/public/parted/target.mk
 include $(TOP_DIR)/ramdisk/rootfs/public/procrank/target.mk
