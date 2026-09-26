@@ -1,0 +1,8 @@
+#! /bin/sh
+
+case $1 in
+  start)
+    # mark boot slot success flag
+    /usr/sbin/ab_boot_tool -d /dev/mmcblk0p4 -m
+    ;;
+esac

@@ -1,0 +1,163 @@
+
+#####################
+# files to boot a minimal system
+
+slink /lib64 lib 777 1000 1000
+dir /dev 755 1000 1000
+dir /dev/shm 755 1000 1000
+dir /dev/pts 755 1000 1000
+dir /media 755 1000 1000
+dir /proc 755 1000 1000
+dir /var 755 1000 1000
+dir /var/lib 755 1000 1000
+dir /mnt 755 1000 1000
+dir /sys 755 1000 1000
+dir /sbin 755 1000 1000
+slink /sbin/mdev ../bin/busybox 777 1000 1000
+slink /sbin/getty ../bin/busybox 777 1000 1000
+slink /sbin/init ../bin/busybox 777 1000 1000
+
+file /gen_initramfs_files.sh ../target/gen_initramfs_files.sh 775 1000 1000
+dir /run 755 1000 1000
+dir /run/lock 755 1000 1000
+dir /lib 755 1000 1000
+
+file /lib/libdl-2.33.so ../target/lib/libdl-2.33.so 755 1000 1000
+slink /lib/libdl.so.2 libdl-2.33.so 777 1000 1000
+slink /lib/libc.so.6 libc-2.33.so 777 1000 1000
+file /lib/libc-2.33.so ../target/lib/libc-2.33.so 755 1000 1000
+file /lib/ld-linux-riscv64v0p7_xthead-lp64d.so.1 ../target/lib/ld-linux-riscv64v0p7_xthead-lp64d.so.1 755 1000 1000
+slink /lib/libpthread.so.0 libpthread-2.33.so 777 1000 1000
+file /lib/libm-2.33.so ../target/lib/libm-2.33.so 755 1000 1000
+file /lib/librt-2.33.so ../target/lib/librt-2.33.so 755 1000 1000
+file /lib/ld-linux-riscv64-lp64d.so.1 ../target/lib/ld-linux-riscv64-lp64d.so.1 755 1000 1000
+file /lib/ld-linux-riscv64xthead-lp64d.so.1 ../target/lib/ld-linux-riscv64xthead-lp64d.so.1 755 1000 1000
+slink /lib/librt.so.1 librt-2.33.so 777 1000 1000
+file /lib/libpthread-2.33.so ../target/lib/libpthread-2.33.so 755 1000 1000
+slink /lib/libm.so.6 libm-2.33.so 777 1000 1000
+file /lib/ld-linux-riscv64-lp64.so.1 ../target/lib/ld-linux-riscv64-lp64.so.1 755 1000 1000
+slink /lib/lp64d ../lib 777 1000 1000
+file /lib/libresolv.so.2 ../target/lib/libresolv.so.2 755 1000 1000
+slink /lib/libatomic.so libatomic.so.1.2.0 777 1000 1000
+slink /lib/libatomic.so.1 libatomic.so.1.2.0 777 1000 1000
+file /lib/libatomic.so.1.2.0 ../target/lib/libatomic.so.1.2.0 755 1000 1000
+
+file /getconf ../target/getconf 755 1000 1000
+dir /usr 755 1000 1000
+slink /usr/lib64 lib 777 1000 1000
+dir /usr/sbin 755 1000 1000
+
+dir /usr/lib 755 1000 1000
+file /usr/lib/os-release ../target/usr/lib/os-release 644 1000 1000
+slink /usr/lib/lp64d ../lib 777 1000 1000
+dir /usr/bin 755 1000 1000
+
+dir /opt 755 1000 1000
+dir /bin 755 1000 1000
+slink /bin/rm busybox 777 1000 1000
+slink /bin/grep busybox 777 1000 1000
+slink /bin/more busybox 777 1000 1000
+slink /bin/watch busybox 777 1000 1000
+slink /bin/mktemp busybox 777 1000 1000
+slink /bin/mount busybox 777 1000 1000
+slink /bin/chgrp busybox 777 1000 1000
+slink /bin/sleep busybox 777 1000 1000
+slink /bin/ps busybox 777 1000 1000
+slink /bin/rmdir busybox 777 1000 1000
+slink /bin/base32 busybox 777 1000 1000
+slink /bin/mknod busybox 777 1000 1000
+slink /bin/nice busybox 777 1000 1000
+slink /bin/run-parts busybox 777 1000 1000
+slink /bin/gzip busybox 777 1000 1000
+slink /bin/cpio busybox 777 1000 1000
+slink /bin/arch busybox 777 1000 1000
+slink /bin/linux32 busybox 777 1000 1000
+file /bin/busybox ../target/bin/busybox 755 1000 1000
+slink /bin/login busybox 777 1000 1000
+slink /bin/sync busybox 777 1000 1000
+slink /bin/echo busybox 777 1000 1000
+slink /bin/umount busybox 777 1000 1000
+slink /bin/chown busybox 777 1000 1000
+slink /bin/fgrep busybox 777 1000 1000
+slink /bin/mountpoint busybox 777 1000 1000
+slink /bin/usleep busybox 777 1000 1000
+slink /bin/printenv busybox 777 1000 1000
+slink /bin/netstat busybox 777 1000 1000
+slink /bin/dumpkmap busybox 777 1000 1000
+slink /bin/gunzip busybox 777 1000 1000
+slink /bin/tar busybox 777 1000 1000
+slink /bin/mt busybox 777 1000 1000
+slink /bin/df busybox 777 1000 1000
+slink /bin/true busybox 777 1000 1000
+slink /bin/pipe_progress busybox 777 1000 1000
+slink /bin/getopt busybox 777 1000 1000
+slink /bin/ash busybox 777 1000 1000
+slink /bin/setserial busybox 777 1000 1000
+slink /bin/setarch busybox 777 1000 1000
+slink /bin/base64 busybox 777 1000 1000
+slink /bin/resume busybox 777 1000 1000
+slink /bin/pwd busybox 777 1000 1000
+slink /bin/touch busybox 777 1000 1000
+slink /bin/dmesg busybox 777 1000 1000
+slink /bin/su busybox 777 1000 1000
+slink /bin/chattr busybox 777 1000 1000
+slink /bin/lsattr busybox 777 1000 1000
+slink /bin/kill busybox 777 1000 1000
+slink /bin/chmod busybox 777 1000 1000
+slink /bin/sed busybox 777 1000 1000
+slink /bin/mv busybox 777 1000 1000
+slink /bin/ln busybox 777 1000 1000
+slink /bin/ls busybox 777 1000 1000
+slink /bin/fdflush busybox 777 1000 1000
+slink /bin/false busybox 777 1000 1000
+slink /bin/setpriv busybox 777 1000 1000
+slink /bin/vi busybox 777 1000 1000
+slink /bin/link busybox 777 1000 1000
+slink /bin/uname busybox 777 1000 1000
+slink /bin/pidof busybox 777 1000 1000
+slink /bin/zcat busybox 777 1000 1000
+slink /bin/sh busybox 777 1000 1000
+slink /bin/rpm busybox 777 1000 1000
+slink /bin/cat busybox 777 1000 1000
+slink /bin/hostname busybox 777 1000 1000
+slink /bin/lzop busybox 777 1000 1000
+slink /bin/egrep busybox 777 1000 1000
+slink /bin/mkdir busybox 777 1000 1000
+slink /bin/cp busybox 777 1000 1000
+slink /bin/ipcalc busybox 777 1000 1000
+slink /bin/linux64 busybox 777 1000 1000
+slink /bin/date busybox 777 1000 1000
+file /init ../target/init_ramboot.sh 755 1000 1000
+dir /root 755 1000 1000
+
+dir /etc 755 1000 1000
+file /etc/shells ../target/etc/shells 644 1000 1000
+file /etc/issue ../target/etc/issue 644 1000 1000
+file /etc/group ../target/etc/group 644 1000 1000
+file /etc/inittab ../target/etc/inittab 644 1000 1000
+file /etc/nsswitch.conf ../target/etc/nsswitch.conf 644 1000 1000
+file /etc/protocols ../target/etc/protocols 644 1000 1000
+slink /etc/os-release ../usr/lib/os-release 777 1000 1000
+file /etc/services ../target/etc/services 644 1000 1000
+file /etc/passwd ../target/etc/passwd 644 1000 1000
+dir /etc/profile.d 755 1000 1000
+file /etc/profile.d/umask.sh ../target/etc/profile.d/umask.sh 644 1000 1000
+file /etc/shadow ../target/etc/shadow 644 1000 1000
+file /etc/profile ../target/etc/profile 644 1000 1000
+file /etc/hosts ../target/etc/hosts 644 1000 1000
+file /etc/fstab ../target/etc/fstab 644 1000 1000
+file /etc/hostname ../target/etc/hostname 644 1000 1000
+dir /etc/init.d 755 1000 1000
+file /etc/init.d/S02sysctl ../target/etc/init.d/S02sysctl 755 1000 1000
+file /etc/init.d/rcS ../target/etc/init.d/rcS 755 1000 1000
+file /etc/init.d/S02klogd ../target/etc/init.d/S02klogd 755 1000 1000
+file /etc/init.d/S01syslogd ../target/etc/init.d/S01syslogd 755 1000 1000
+file /etc/init.d/rcK ../target/etc/init.d/rcK 755 1000 1000
+dir /tmp 755 1000 1000
+slink /linuxrc bin/busybox 777 1000 1000
+
+# custom files
+file /bin/bmcpu ../target/bin/bmcpu 755 0 0
+file /bin/ap_emu ../target/bin/ap_emu 755 0 0
+file /lib/libdl_test.so ../target/lib/libdl_test.so 755 0 0
+file /etc/init.d/S90test_c906 ../target/etc/init.d/S90test_c906 755 1000 1000

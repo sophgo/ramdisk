@@ -48,6 +48,5 @@ chmod 4755 /bin/su
 exec 0</dev/console
 exec 1>/dev/console
 exec 2>/dev/console
-
 #Go!
 exec /sbin/init $*
