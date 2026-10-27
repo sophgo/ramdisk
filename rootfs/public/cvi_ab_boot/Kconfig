@@ -1,0 +1,5 @@
+config TARGET_PACKAGE_AB_BOOT
+	bool "Target package cvi_ab_boot"
+	default n
+	help
+	  target cvi_ab_boot

@@ -3,8 +3,7 @@ umask 077
 
 case "$1" in
   start)
-        cat /proc/cpuinfo
-        bmcpu&
+        /bin/bmcpu >/dev/null 2>&1
 	;;
   stop)
 	;;
@@ -14,4 +13,3 @@ case "$1" in
 esac
 
 exit $?
-
