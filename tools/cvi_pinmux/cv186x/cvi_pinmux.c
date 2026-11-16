@@ -10,6 +10,14 @@
 #define NELEMS(x) (sizeof(x) / sizeof((x)[0]))
 #define PINMUX_SEL_SHIFT 4
 
+/* dsi phy regs, PAD_MIPI0_TX* -> DSI_PHY0, PAD_MIPI1_TX* -> DSI_PHY1 */
+#define DSI_PHY0_REG_BASE	0x6700A000
+#define DSI_PHY1_REG_BASE	0x6700B000
+#define DSI_PHY_EXT_GPIO_REG	0xc0	/* dat_en[9:0], oen_en[19:10], ie_en[29:20] */
+#define DSI_PHY_POWER_REG	0x160	/* pd_mipi_lane[28:24], pd_pll[29], pd_ref_lane[30] */
+#define DSI_PHY_EXT_GPIO_OEN_SHIFT	10
+#define DSI_PHY_EXT_GPIO_IE_SHIFT	20
+
 static group_pinmux_regs regs = {
 	.g1_pinmux = G1_PINMUX_REG_REG_BASE,	
 	.g5_pinmux = G5_PINMUX_REG_REG_BASE,
@@ -157,7 +165,49 @@ int check_set_ip_mux(const char *func, uint32_t group, bool set)
 	return check_set_ipmux(core_ip_mux, func, group, CORE_IP_MUX_REG_GRP_BASE, set);
 }
 
-void set_pinmux(const char *pin, const char *func, uint32_t group, int index) 
+/**
+ * @description: mipi tx pins are gated by dsi phy gpio mode, which is disabled
+ *		 by the dsi/hdmi driver. When such a pin is muxed to a non-mipi func
+ *		 (gpio/uart/i2c...), power on the phy and enable gpio mode for the pin.
+ * @param {char} *pin
+ * @param {bool} is_mipi: true if pin is muxed to its mipi func
+ * @return {*}
+ */
+void set_mipi_tx_gpio_mode(const char *pin, bool is_mipi)
+{
+	int phy, lane;
+	char pn;
+	unsigned long base, addr;
+	uint32_t val, mask;
+
+	if (sscanf(pin, "PAD_MIPI%d_TX%d%c", &phy, &lane, &pn) != 3)
+		return;
+	if (phy < 0 || phy > 1 || lane < 0 || lane > 4 || (pn != 'P' && pn != 'N'))
+		return;
+
+	base = phy ? DSI_PHY1_REG_BASE : DSI_PHY0_REG_BASE;
+	/* tx0p -> bit0, tx0n -> bit1, tx1p -> bit2 ... tx4n -> bit9 */
+	lane = lane * 2 + (pn == 'N');
+	mask = BIT(lane);
+	mask |= (mask << DSI_PHY_EXT_GPIO_OEN_SHIFT) | (mask << DSI_PHY_EXT_GPIO_IE_SHIFT);
+
+	if (!is_mipi) {
+		devmem_writel(base + DSI_PHY_POWER_REG, 0x0);
+		printf("set dsi phy power reg:0x%lX, val: 0x%X\n", base + DSI_PHY_POWER_REG,
+		       devmem_readl(base + DSI_PHY_POWER_REG));
+	}
+
+	addr = base + DSI_PHY_EXT_GPIO_REG;
+	val = devmem_readl(addr);
+	if (is_mipi)
+		val &= ~mask;
+	else
+		val |= mask;
+	devmem_writel(addr, val);
+	printf("set dsi phy gpio mode reg:0x%lX, val: 0x%X\n", addr, devmem_readl(addr));
+}
+
+void set_pinmux(const char *pin, const char *func, uint32_t group, int index)
 {
 	int i;
 	uint32_t max_fun_num = NELEMS(pinlist_map[index].funcs);
@@ -165,17 +215,21 @@ void set_pinmux(const char *pin, const char *func, uint32_t group, int index)
 
  	unsigned long addr = get_group_pinmux_base(pin, group);
 	for (i = 0; i < max_fun_num; ++i) {
-		if (strcmp(func, pinlist_map[index].funcs[i]) == 0) 
+		if (strcmp(func, pinlist_map[index].funcs[i]) == 0)
 			break;
 	}
 	if (i == max_fun_num) {
 		printf("Invalid func %s \n", func);
+		return;
 	}
 	uint32_t val = devmem_readl(addr);
 	val &= ~(0xf << PINMUX_SEL_SHIFT);
 	val |= (i << PINMUX_SEL_SHIFT);
 	devmem_writel(addr, val);
 	printf("set pinmux reg:0x%lX, shift: %d\n", addr, PINMUX_SEL_SHIFT);
+
+	/* func 0 is the mipi func itself */
+	set_mipi_tx_gpio_mode(pin, i == 0);
 }
 
 void set_pin_pd(const char *pin, int pull_down, uint32_t group)
